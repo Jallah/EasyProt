@@ -1,6 +1,8 @@
 module EasyProt.Tests
 
 open NUnit.Framework
+open EasyProt.Runtime.Pipeline
+
 
 [<Test>]
 let ``simple test`` () =

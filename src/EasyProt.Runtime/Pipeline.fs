@@ -1,2 +1,2 @@
-﻿module Pipeline
+﻿module EasyProt.Runtime.Pipeline
 
