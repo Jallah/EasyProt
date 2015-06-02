@@ -85,6 +85,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\EasyProt.Core\EasyProt.Core.fsproj">
+      <Name>EasyProt.Core</Name>
+      <Project>{7312d058-3c47-423d-bc02-58e8cd9b5bf0}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\EasyProt.Runtime\EasyProt.Runtime.fsproj">
       <Name>EasyProt.Runtime</Name>
       <Project>{81b3b1be-87c9-4f59-b228-2bb738f28b6f}</Project>
