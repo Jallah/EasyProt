@@ -49,8 +49,10 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="Pipeline.fs" />
+    <Compile Include="Helper.fs" />
+    <Compile Include="Runtime.fs" />
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="RuntimeManager.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

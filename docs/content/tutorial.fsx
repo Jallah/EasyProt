@@ -10,8 +10,8 @@ Introducing your project
 Say more
 
 *)
-#r "EasyProt.Runtime.dll"
-open EasyProt
+//#r "EasyProt.Runtime.dll"
+//open EasyProt
 
 (**
 Some more info
