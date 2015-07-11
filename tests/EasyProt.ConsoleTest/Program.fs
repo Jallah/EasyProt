@@ -2,10 +2,10 @@
 open EasyProt.Runtime
 
 let member1 = {new IPipelineMember with
-                    member this.ProceedAsync input = input + "XX"}
+                    member this.Proceed input = input + "XX"}
 
 let member2 = {new IPipelineMember with
-                    member this.ProceedAsync input = "XX" + input}
+                    member this.Proceed input = "XX" + input}
 
 
 [<EntryPoint>]

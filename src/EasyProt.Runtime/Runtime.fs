@@ -7,7 +7,7 @@ type Pipeline() =
         member this.RunAsync pipelineMember = 
             let pipe = 
                 pipelineMember
-                |> List.map (fun m -> m.ProceedAsync)
+                |> List.map (fun m -> m.Proceed)
                 |> List.reduce (>>)
             (fun input -> async { return pipe input })
 

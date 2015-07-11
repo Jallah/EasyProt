@@ -3,11 +3,11 @@
 ///This interface ist just for convenience.
 ///Its a nice API for other .NET languages like C#.
 type IPipelineMember =
-    abstract member ProceedAsync : string -> string
+    abstract member Proceed : string -> string
 
 
 type IPipeline =
-   ///Runs the Protocol pipeline.
+   ///Runs the Message pipeline.
    abstract member RunAsync : IPipelineMember list -> (string -> Async<string>)
 
 
