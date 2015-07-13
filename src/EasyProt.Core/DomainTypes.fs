@@ -11,11 +11,22 @@ type IPipeline =
    abstract member RunAsync : IPipelineMember list -> (string -> Async<string>)
 
 
+type IncomingMessageEventArgs(message: string) =
+    inherit System.EventArgs()
+    let message = message
+    member this.Message with get() = message
+
+
+type IngomingMessageDelegate = delegate of obj * IncomingMessageEventArgs -> unit
+
+
 type IProtClient =
+    [<CLIEvent>]
+    abstract member OnIncomingMessage : IEvent<IngomingMessageDelegate, IncomingMessageEventArgs>
     abstract member ConnectAsync : ip:string * port:int -> Async<unit>
     abstract member SendAsync : message:string -> Async<unit>
     abstract member DisconnectAsync: Async<unit>
-    abstract member ListenAsync: Async<unit>
+    abstract member ListenForMessageAsync: Async<unit>
 
 
 type ClientConnectedEventArgs(client: System.Net.Sockets.TcpClient) =

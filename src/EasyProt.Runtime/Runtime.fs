@@ -20,14 +20,20 @@ open System.Threading.Tasks
 type DefaultProtClient() =
 
     let tcpClient = new TcpClient()
+    let incomingMessageEvent = new Event<IngomingMessageDelegate, IncomingMessageEventArgs>()
+
     interface IProtClient with
 
-        member this.ListenAsync = async{
+        [<CLIEvent>]
+        member this.OnIncomingMessage = incomingMessageEvent.Publish
+
+        member this.ListenForMessageAsync = async{
             let stream = tcpClient.GetStream()
             use streamReader = new StreamReader(stream)
 
             while true do
                 let! line = streamReader.ReadLineAsync() |> Async.AwaitTask
+                incomingMessageEvent.Trigger(this, new IncomingMessageEventArgs(line))
                 ()
         }
 
