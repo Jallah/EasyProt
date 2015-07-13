@@ -17,10 +17,9 @@ open System.Net.Sockets
 open System.IO
 open System.Threading.Tasks
 
-type DefautlClient() =
+type DefaultProtClient() =
 
     let tcpClient = new TcpClient()
-
     interface IProtClient with
 
         member this.ListenAsync = async{
@@ -47,9 +46,8 @@ type DefautlClient() =
 
     interface System.IDisposable with
         member this.Dispose() = tcpClient.Close()
-        
 
-type DefaultServer() =
+type DefaultProtServer() =
     let clientConnectedEvent = new Event<ClientConnectedDelegate, ClientConnectedEventArgs>()
 
     interface IProtServer with
