@@ -4,24 +4,34 @@
 open EasyProt.Core
 open EasyProt.Runtime
 
-
-type Client(protClient: IProtClient, pipes : (IPipeline*IProtMessage) list) as this=
+//TODO: Test it
+type Client(protClient: IProtClient, pipes : (IPipelineMember list*IProtMessage) list) as this=
     do 
-        protClient.OnIncomingMessage.AddHandler(fun _ a -> match (a.Message |> this.getMessage) with
-                                                            | Some(_, message: IProtMessage) -> (message.HandleMessageAsync a.Message) |> Async.Start
-                                                            | None -> failwith "No matching MessageHandler or DefaultHandler found" )
+        protClient.OnIncomingMessage.AddHandler(fun o a -> this.IncomingMessageEventHandler(o, a))
 
-    member private this.getMessage msg = pipes |> List.tryFind (fun (_, message) -> async  {
+    member private this.getMessage msg = pipes |> List.tryFind (fun (_, message) -> async  { //TODO: maybe change ValidateAsync to Validate
                                                                                       let! isValid = message.ValidateAsync(msg)
                                                                                       return isValid
                                                                                     } |> Async.RunSynchronously)
-    member this.SendAsync msg = protClient.SendAsync(msg) |> Async.StartAsTask
+
+    member this.SendAsync msg = match this.getMessage msg with
+                                | Some(pipelineMembers, _) -> async{
+                                                                     //get the pipeline result --> feed the pipe
+                                                                     let! pipelineResult = (new Pipeline() :> IPipeline).RunAsync pipelineMembers msg
+                                                                     do! protClient.SendAsync pipelineResult
+                                                              } |> Async.StartAsTask
+                                | None -> failwith "No matching pipelinemember(s) or default pipelinemember(s) found"
+                                  
+
     member this.ListenAsync = protClient.ListenForMessageAsync |> Async.StartAsTask
+
     member this.ConnectAsync(ip, port) = protClient.ConnectAsync(ip, port) |> Async.StartAsTask
+
     member this.DisconnectAsync = protClient.DisconnectAsync |> Async.StartAsTask
+
     member private this.IncomingMessageEventHandler (sender: obj, a: IncomingMessageEventArgs) = 
         match (a.Message |> this.getMessage) with
-        | Some(_, message) -> message.HandleMessageAsync a.Message|> Async.StartAsTask |> ignore
+        | Some(_, message: IProtMessage) -> (message.HandleMessageAsync a.Message) |> Async.StartAsTask |> ignore
         | None -> failwith "No matching MessageHandler or DefaultHandler found"
         
 
@@ -29,7 +39,7 @@ type Client(protClient: IProtClient, pipes : (IPipeline*IProtMessage) list) as t
 //if the User does not give list of PipelineMembers use the default pipeline (input = input)
 type RuntimeManager(?client) =
     let pipeline = new Pipeline() :> IPipeline //private member
-    let mutable messages : (IPipeline*IProtMessage) list= []
+    let mutable messages : (IPipelineMember list*IProtMessage) list= []
     let mutable client = defaultArg client (new DefaultProtClient() :> IProtClient)
     let defaultPipeline = ({new IPipelineMember with
                              member this.Proceed input = input})::[]
@@ -42,4 +52,4 @@ type RuntimeManager(?client) =
 
     member this.RegisterMessage (messagePipeLine, message) = (messagePipeLine,message)::messages
     member this.RegisterMessage message = (defaultPipeline, message)
-    //member this.GetProtClient = 
+    member this.GetProtClient = new Client(client, messages)
