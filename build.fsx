@@ -195,10 +195,10 @@ Target "PublishNuget" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Generate the documentation
 
-//Target "GenerateReferenceDocs" (fun _ ->
-//    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:REFERENCE"] [] then
-//      failwith "generating reference documentation failed"
-//)
+Target "GenerateReferenceDocs" (fun _ ->
+    if not <| executeFSIWithArgs "docs/tools" "generate.fsx" ["--define:RELEASE"; "--define:REFERENCE"] [] then
+      failwith "generating reference documentation failed"
+)
 
 let generateHelp' fail debug =
     let args =
@@ -342,8 +342,8 @@ Target "All" DoNothing
   ==> "Build"
   ==> "CopyBinaries"
   ==> "RunTests"
-  //==> "GenerateReferenceDocs"
-  //==> "GenerateDocs"
+  ==> "GenerateReferenceDocs"
+  ==> "GenerateDocs"
   ==> "All"
   =?> ("ReleaseDocs",isLocalBuild)
 
@@ -356,9 +356,9 @@ Target "All" DoNothing
   ==> "BuildPackage"
 
 "CleanDocs"
- // ==> "GenerateHelp"
- //==> "GenerateReferenceDocs" //FAILS: https://github.com/fsprojects/ProjectScaffold/issues/170
- // ==> "GenerateDocs"
+  ==> "GenerateHelp"
+  ==> "GenerateReferenceDocs" //FAILS: https://github.com/fsprojects/ProjectScaffold/issues/170
+  ==> "GenerateDocs"
 
 "CleanDocs"
   ==> "GenerateHelpDebug"
