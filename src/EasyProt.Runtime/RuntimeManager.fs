@@ -34,14 +34,15 @@ type Client(protClient: IProtClient, pipes : (IPipelineMember list*IProtMessage)
         | Some(_, message: IProtMessage) -> (message.HandleMessageAsync a.Message) |> Async.StartAsTask |> ignore
         | None -> failwith "No matching MessageHandler or DefaultHandler found"
 
-//TODO: continue here !!!
-//type Server(protServer: IProtServer) as this =
-    
-        
+
+type Server(protServer: IProtServer) =
+    member this.OnClientConnected = protServer.OnClientConnected
+    member this.ListenForClientsAsync port = protServer.ListenForClientsAsync port |> Async.StartAsTask |> ignore
+
 
 //TODO: Make it possible to Register a Pipeline for each Message
 //if the User does not give list of PipelineMembers use the default pipeline (input = input)
-type RuntimeManager(?client, ?server) =
+type RuntimeManager(?client, ?server)=
     let pipeline = new Pipeline() :> IPipeline //private member
     let mutable messages : (IPipelineMember list*IProtMessage) list= []
     let client = defaultArg client (new DefaultProtClient() :> IProtClient)
@@ -49,10 +50,13 @@ type RuntimeManager(?client, ?server) =
     let defaultPipeline = ({new IPipelineMember with
                              member this.Proceed input = input})::[]
 
-    member this.RegisterMessage (messagePipeLine, message) = (messagePipeLine,message)::messages
+    member this.RegisterMessage (messagePipeLine, message) = messages <- (messagePipeLine,message)::messages
+                                                             
 
-    member this.RegisterMessage message = (defaultPipeline, message)
+    member this.RegisterMessage message = messages <- (defaultPipeline, message)::messages
 
-    member this.GetProtClient = new Client(client, messages)
+    member this.GetProtClient ()= new Client(client, messages)
+
+    member this.GetProtServer ()= new Server(server)
 
     
