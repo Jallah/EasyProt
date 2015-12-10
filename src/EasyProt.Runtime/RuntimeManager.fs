@@ -1,4 +1,4 @@
-﻿module EasyProt.Runtime.RuntimeManager
+﻿namespace EasyProt.Runtime
 
 
 open EasyProt.Core
@@ -36,6 +36,7 @@ type Client(protClient: IProtClient, pipes : (IPipelineMember list*IProtMessage)
 
 
 type Server(protServer: IProtServer) =
+    [<CLIEvent>]
     member this.OnClientConnected = protServer.OnClientConnected
     member this.ListenForClientsAsync port = protServer.ListenForClientsAsync port |> Async.StartAsTask |> ignore
 
@@ -49,6 +50,8 @@ type RuntimeManager(?client, ?server)=
     let server = defaultArg server (new DefaultProtServer() :> IProtServer)
     let defaultPipeline = ({new IPipelineMember with
                              member this.Proceed input = input})::[]
+    
+    new() = RuntimeManager(?client = None, ?server = None)
 
     member this.RegisterMessage (messagePipeLine, message) = messages <- (messagePipeLine,message)::messages
                                                              

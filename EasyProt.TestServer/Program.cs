@@ -11,12 +11,13 @@ namespace EasyProt.TestServer
         static void Main(string[] args)
         {
 
-            var manager = new Runtime.RuntimeManager.RuntimeManager(Microsoft.FSharp.Core.FSharpOption<Core.IProtClient>.None, Microsoft.FSharp.Core.FSharpOption<Core.IProtServer>.None);
-
+            //var manager = new Runtime.RuntimeManager.RuntimeManager(Microsoft.FSharp.Core.FSharpOption<Core.IProtClient>.None, Microsoft.FSharp.Core.FSharpOption<Core.IProtServer>.None);
+            //
+            var manager = new Runtime.RuntimeManager();
             var server = manager.GetProtServer();
 
-
-            server.OnClientConnected.AddHandler((o, a) => 
+            server.OnClientConnected += 
+            (o, a) =>
             {
                 Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
 
@@ -25,10 +26,10 @@ namespace EasyProt.TestServer
                 while (true)
                 {
                     var msg = reader.ReadLine();
-                    Console.WriteLine(msg);    
+                    Console.WriteLine(msg);
                 }
-                        
-            });
+
+            };
 
             server.ListenForClientsAsync(8080);
 

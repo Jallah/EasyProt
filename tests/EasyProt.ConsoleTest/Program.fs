@@ -20,7 +20,7 @@ let msg2 = { new IProtMessage with
 [<EntryPoint>]
 let main argv = 
 
-    let rntMngr = new EasyProt.Runtime.RuntimeManager.RuntimeManager();
+    let rntMngr = new EasyProt.Runtime.RuntimeManager();
 
     rntMngr.RegisterMessage(member1::member2::[], msg1) |> ignore
     rntMngr.RegisterMessage(msg2) |> ignore
