@@ -45,7 +45,7 @@ type IProtServer =
 
 
 type IProtMessage =
-    abstract member ValidateAsync : message:string -> Async<bool>
+    abstract member Validate : message:string -> bool
     abstract member HandleMessageAsync : message:string -> Async<unit>
 
     

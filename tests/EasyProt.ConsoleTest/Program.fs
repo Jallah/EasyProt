@@ -9,11 +9,11 @@ let member2 = {new IPipelineMember with
 
 
 let msg1 = { new IProtMessage with 
-                member this.ValidateAsync message = async { return message.[0] = '1' }
+                member this.Validate message = message.[0] = '1'
                 member this.HandleMessageAsync message = async { System.Console.WriteLine("msg1: " + message) } }
 
 let msg2 = { new IProtMessage with 
-                member this.ValidateAsync message = async { return message.[0] = '2' }
+                member this.Validate message = message.[0] = '2'
                 member this.HandleMessageAsync message = async { System.Console.WriteLine("msg2: " + message) } }
 
                  

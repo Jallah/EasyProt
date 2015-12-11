@@ -4,16 +4,13 @@
 open EasyProt.Core
 open EasyProt.Runtime
 
-//TODO: Test it
+//TODO: Add a ReconectMethode (see DefaultClient --> just Call ConnectAsync again)
 type Client(protClient: IProtClient, pipes : (IPipelineMember list*IProtMessage) list) as this=
     do 
         protClient.OnIncomingMessage.AddHandler(fun o a -> this.IncomingMessageEventHandler(o, a))
 
-    member private this.getMessage msg = pipes |> List.tryFind (fun (_, message) -> async  { //TODO: maybe change ValidateAsync to Validate
-                                                                                      let! isValid = message.ValidateAsync(msg)
-                                                                                      return isValid
-                                                                                    } |> Async.RunSynchronously)
-
+    member private this.getMessage msg = pipes |> List.tryFind (fun (_, message) ->  message.Validate(msg))
+                                                                                      
     member this.SendAsync msg = match this.getMessage msg with
                                 | Some(pipelineMembers, _) -> async{
                                                                      //get the pipeline result --> feed the pipe
@@ -35,16 +32,16 @@ type Client(protClient: IProtClient, pipes : (IPipelineMember list*IProtMessage)
         | None -> failwith "No matching MessageHandler or DefaultHandler found"
 
 
+//TODO: Add a StopListening() member
 type Server(protServer: IProtServer) =
     [<CLIEvent>]
     member this.OnClientConnected = protServer.OnClientConnected
     member this.ListenForClientsAsync port = protServer.ListenForClientsAsync port |> Async.StartAsTask |> ignore
 
 
-//TODO: Make it possible to Register a Pipeline for each Message
-//if the User does not give list of PipelineMembers use the default pipeline (input = input)
+//TODO: Make it possible to Register a Pipeline not just for outgoing messages but also for inc messages
 type RuntimeManager(?client, ?server)=
-    let pipeline = new Pipeline() :> IPipeline //private member
+    //let pipeline = new Pipeline() :> IPipeline //private member
     let mutable messages : (IPipelineMember list*IProtMessage) list= []
     let client = defaultArg client (new DefaultProtClient() :> IProtClient)
     let server = defaultArg server (new DefaultProtServer() :> IProtServer)
@@ -55,11 +52,10 @@ type RuntimeManager(?client, ?server)=
 
     member this.RegisterMessage (messagePipeLine, message) = messages <- (messagePipeLine,message)::messages
                                                              
-
     member this.RegisterMessage message = messages <- (defaultPipeline, message)::messages
 
-    member this.GetProtClient ()= new Client(client, messages)
+    member this.GetProtClient() = new Client(client, messages)
 
-    member this.GetProtServer ()= new Server(server)
+    member this.GetProtServer() = new Server(server)
 
     
