@@ -17,8 +17,8 @@ open System.Net.Sockets
 open System.IO
 
 type DefaultProtClient() = 
-    let mutable tcpClient : TcpClient = null
-    let mutable streamWriter : StreamWriter = null
+    let mutable tcpClient : TcpClient = Unchecked.defaultof<_>
+    let mutable streamWriter : StreamWriter = Unchecked.defaultof
     let incomingMessageEvent = new Event<IngomingMessageDelegate, IncomingMessageEventArgs>()
     
     member private this.DisposeStream() = 

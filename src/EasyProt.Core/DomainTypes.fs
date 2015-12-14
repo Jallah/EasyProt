@@ -1,13 +1,13 @@
 ﻿namespace EasyProt.Core
 
-///This interface ist just for convenience.
-///Its a nice API for other .NET languages like C#.
+/// This interface ist just for convenience.
+/// Its a nice API for other .NET languages like C#.
 type IPipelineMember =
     abstract member Proceed : string -> string
 
 
 type IPipeline =
-   ///Runs the Message pipeline.
+   /// Runs the message Pipeline.
    abstract member RunAsync : IPipelineMember list -> (string -> Async<string>)
 
 
@@ -45,7 +45,10 @@ type IProtServer =
 
 
 type IProtMessage =
+    /// This method is used to determine the message.
     abstract member Validate : message:string -> bool
+    // This methode will be called to handle incoming messages.
+    // Outgoing messages will be handled by the defined Pipeline wich you can register with RuntimeManager.RegisterMessage()
     abstract member HandleMessageAsync : message:string -> Async<unit>
 
     

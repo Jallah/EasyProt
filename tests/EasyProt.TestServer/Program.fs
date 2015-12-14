@@ -32,10 +32,13 @@ let main argv =
                  System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
 
                  let reader = new System.IO.StreamReader(a.Client.GetStream());
+                 let writer = new System.IO.StreamWriter(a.Client.GetStream());
  
                  while true do
                     let msg = reader.ReadLine();
                     System.Console.WriteLine(msg);
+                    writer.WriteLine("S " + msg + " got it")
+                    writer.Flush()
                )
 
     server.ListenForClientsAsync(8080)
