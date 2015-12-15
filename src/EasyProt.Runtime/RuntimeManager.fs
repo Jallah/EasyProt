@@ -4,7 +4,7 @@
 open EasyProt.Core
 open EasyProt.Runtime
 
-//TODO: Add a ReconectMethode (see DefaultClient --> just Call ConnectAsync again)
+//TODO: Add a Reconect()-method (see DefaultClient --> just Call ConnectAsync again)
 //      Add a StopListening()-method
 type Client(protClient: IProtClient, pipe : (IPipelineMember list*IProtMessage) list) as this=
     do 
@@ -33,13 +33,14 @@ type Client(protClient: IProtClient, pipe : (IPipelineMember list*IProtMessage) 
 
 
 //TODO: Add a StopListening()-method
+//      Add a opportunity to use the IProtMessage(s) and IPipeline(s) for inc. and outgoing messages
 type Server(protServer: IProtServer) =
     [<CLIEvent>]
     member this.OnClientConnected = protServer.OnClientConnected
     member this.ListenForClientsAsync port = protServer.ListenForClientsAsync port |> Async.StartAsTask |> ignore
 
-//TODO: Add a opportunity to Register a Message
-//      Add a opportunity to Register a DefaultHandler
+//TODO: Add a opportunity to re-register a message
+//      Add a opportunity to register a defaultHandler
 type RuntimeManager(?client, ?server)=
     let mutable messages : (IPipelineMember list*IProtMessage) list= []
     let client = defaultArg client (new DefaultProtClient() :> IProtClient)
