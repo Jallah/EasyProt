@@ -37,7 +37,7 @@ The result of this pipeline will be a string wiht leading and trailing **"XX"** 
     abstract member HandleMessageAsync : message:string -> Async<unit>
 ```
 
-The ``Validate()`` method ist responsible determine the message. Let's look at a very easy implementation:
+The ``Validate()`` method ist responsible to determine the message. Let's look at a very easy implementation:
 ``` csharp
    let msg1 = 
     { new IProtMessage with
