@@ -5,7 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/cyi4mev19l12jyya?svg=true)](https://ci.appveyor.com/project/Jallah/easyprot)
 
 ## Description
-EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usualy you just have to devine your messages by implementing the `IProtMessage ` interface. The communication between the Clients and the Sever runs asynchronus.
+EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usualy you just have to define your messages by implementing the `IProtMessage ` interface. The communication between the Clients and the Sever runs asynchronus.
 
 ## Usage
 There are much cool things you can do to create your own Protocol. EasyProt is written in F# but you can write your Implementation in every .NET Language even in VB .NET (don't take it too serious VB-Lovers :P)
