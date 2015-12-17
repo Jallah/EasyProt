@@ -5,14 +5,14 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/cyi4mev19l12jyya?svg=true)](https://ci.appveyor.com/project/Jallah/easyprot)
 
 ## Description
-EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usualy you just have to define your messages by implementing the `IProtMessage ` interface. The communication between the Clients and the Sever runs asynchronus.
+EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usually you just have to define your messages by implementing the `IProtMessage ` interface. The communication between the Clients and the Sever runs asynchronus.
 
 ## Usage
 There are much cool things you can do to create your own Protocol. EasyProt is written in F# but you can write your Implementation in every .NET Language even in VB .NET (don't take it too serious VB-Lovers :P)
 
 **IPipelineMember**
 
-This interface just consits of one method.
+This interface just consits of one method:
 ``` csharp
     // C# string Proceed(string message)
     abstract member Proceed : string -> string
@@ -45,6 +45,8 @@ The ``Validate()`` method ist responsible to determine the message. Let's look a
           member this.HandleMessageAsync message = async { System.Console.WriteLine("msg1: " + message) } }
 ```
 So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows wich ``HandleMessageAsync()`` implementation or Pipeline should be called. This member is the counterpart to for the Pipeline.
+
+Some more instructions will follow soon ...
 
 ## TODO
 - Comments in EasyProt.Runtime.RuntimeManager(.fs)
