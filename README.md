@@ -13,12 +13,12 @@ There are much cool things you can do to create your own Protocol. EasyProt is w
 **IPipelineMember**
 
 This interface just consits of one method:
-``` csharp
+``` fsharp
 // C# string Proceed(string message)
 abstract member Proceed : string -> string
 ```
 Let's look at two very simple implementations:
-``` csharp
+``` fsharp
 let member1 = 
     { new IPipelineMember with
           member this.Proceed input = input + "XX" }
@@ -30,14 +30,14 @@ let member2 =
 The result of this pipeline will be a string with leading and trailing **"XX"** (see screenshot below). Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever.Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
 
 **IProtMessage**
-``` csharp
+``` fsharp
 // C# bool Validate(string message)
 abstract member Validate : message:string -> bool
 // C# Task HandleMessageAsync(string message)
 abstract member HandleMessageAsync : message:string -> Async<unit>
 ```
 The ``Validate()`` method ist responsible to determine the message. Let's look at a very simple implementation:
-``` csharp
+``` fsharp
 let msg1 = 
     { new IProtMessage with
           member this.Validate message = message.[0] = '1'
@@ -49,19 +49,19 @@ So every time when the first sign of an incoming message is a **_1_** the Client
 
 After defining your messages and pipelines you should use the ``RuntimeManager`` as follows:
 
-``` csharp
+``` fsharp
 let rntMngr = new EasyProt.Runtime.RuntimeManager()
 rntMngr.RegisterMessage(member1 :: member2 :: [], msg1) |> ignore
 rntMngr.RegisterMessage(msg2) |> ignore // use default pipeline -> input == output
 rntMngr.RegisterMessage(msg3) |> ignore
 ```
 After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
-``` csharp
+``` fsharp
 // ...
 let client = rntMngr.GetProtClient()
 ```
 
-``` csharp
+``` fsharp
 // ...
 let server = rntMngr.GetProtServer()
 ```
