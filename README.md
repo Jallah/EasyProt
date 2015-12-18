@@ -14,8 +14,8 @@ There are much cool things you can do to create your own Protocol. EasyProt is w
 
 This interface just consits of one method:
 ``` csharp
-    // C# string Proceed(string message)
-    abstract member Proceed : string -> string
+// C# string Proceed(string message)
+abstract member Proceed : string -> string
 ```
 Let's look at two very simple implementations:
 ``` csharp
@@ -31,14 +31,14 @@ The result of this pipeline will be a string with leading and trailing **"XX"** 
 
 **IProtMessage**
 ``` csharp
-    // C# bool Validate(string message)
-    abstract member Validate : message:string -> bool
-    // C# Task HandleMessageAsync(string message)
-    abstract member HandleMessageAsync : message:string -> Async<unit>
+// C# bool Validate(string message)
+abstract member Validate : message:string -> bool
+// C# Task HandleMessageAsync(string message)
+abstract member HandleMessageAsync : message:string -> Async<unit>
 ```
 The ``Validate()`` method ist responsible to determine the message. Let's look at a very simple implementation:
 ``` csharp
-   let msg1 = 
+let msg1 = 
     { new IProtMessage with
           member this.Validate message = message.[0] = '1'
           member this.HandleMessageAsync message = async { System.Console.WriteLine("msg1: " + message) } }
@@ -50,20 +50,20 @@ So every time when the first sign of an incoming message is a **_1_** the Client
 After defining your messages and pipelines you should use the ``RuntimeManager`` as follows:
 
 ``` csharp
-    let rntMngr = new EasyProt.Runtime.RuntimeManager()
-    rntMngr.RegisterMessage(member1 :: member2 :: [], msg1) |> ignore
-    rntMngr.RegisterMessage(msg2) |> ignore // use default pipeline -> input == output
-    rntMngr.RegisterMessage(msg3) |> ignore
+let rntMngr = new EasyProt.Runtime.RuntimeManager()
+rntMngr.RegisterMessage(member1 :: member2 :: [], msg1) |> ignore
+rntMngr.RegisterMessage(msg2) |> ignore // use default pipeline -> input == output
+rntMngr.RegisterMessage(msg3) |> ignore
 ```
 After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
 ``` csharp
-    // ...
-    let client = rntMngr.GetProtClient()
+// ...
+let client = rntMngr.GetProtClient()
 ```
 
 ``` csharp
-    // ...
-    let server = rntMngr.GetProtServer()
+// ...
+let server = rntMngr.GetProtServer()
 ```
 The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient`` and ``IProtServer`` implemenation instead of the default ones.
 
