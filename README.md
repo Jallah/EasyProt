@@ -27,7 +27,7 @@ let member2 =
     { new IPipelineMember with
           member this.Proceed input = "XX" + input }
 ```
-The result of this pipeline will be a string with leading and trailing **"XX"** (see screenshot below). Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
+The result of this pipeline will be a string with leading and trailing **"XX"** (see screenshot below). Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :). Let's have a look at the main parts of this small Framework:
 
 **IProtMessage**
 ``` fsharp
@@ -45,7 +45,7 @@ let msg1 =
 ```
 So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows wich ``HandleMessageAsync()`` implementation or Pipeline should be called. This member is the counterpart to the Pipeline.
 
-## RuntimeManager
+**RuntimeManager**
 
 After defining your messages and pipelines you should use the ``RuntimeManager`` as follows:
 
