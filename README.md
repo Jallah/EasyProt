@@ -30,7 +30,7 @@ let member2 =
 The result of this pipeline will be a string with leading and trailing **"XX"** (see screenshot below). Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever.Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
 
 **IProtMessage**
-``` csharp
+``` fsharp
 // C# bool Validate(string message)
 abstract member Validate : message:string -> bool
 // C# Task HandleMessageAsync(string message)
