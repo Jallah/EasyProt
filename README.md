@@ -36,7 +36,6 @@ The result of this pipeline will be a string with leading and trailing **"XX"** 
     // C# Task HandleMessageAsync(string message)
     abstract member HandleMessageAsync : message:string -> Async<unit>
 ```
-
 The ``Validate()`` method ist responsible to determine the message. Let's look at a very simple implementation:
 ``` csharp
    let msg1 = 
@@ -45,6 +44,32 @@ The ``Validate()`` method ist responsible to determine the message. Let's look a
           member this.HandleMessageAsync message = async { System.Console.WriteLine("msg1: " + message) } }
 ```
 So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows wich ``HandleMessageAsync()`` implementation or Pipeline should be called. This member is the counterpart to the Pipeline.
+
+## RuntimeManager
+
+After defining your messages and pipelines you should use the ``RuntimeManager`` as follows:
+
+``` csharp
+    let rntMngr = new EasyProt.Runtime.RuntimeManager()
+    rntMngr.RegisterMessage(member1 :: member2 :: [], msg1) |> ignore
+    rntMngr.RegisterMessage(msg2) |> ignore // use default pipeline -> input == output
+    rntMngr.RegisterMessage(msg3) |> ignore
+```
+After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
+``` csharp
+    // ...
+    let client = rntMngr.GetProtClient()
+```
+
+``` csharp
+    // ...
+    let server = rntMngr.GetProtServer()
+```
+The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient`` and ``IProtServer`` implemenation instead of the default ones.
+
+You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and a test server (right side):
+
+[[https://github.com/Jallah/EasyProt/blob/master/docs/files/img/ClientServer.jpg|alt=ClientServer]]
 
 Some more instructions will follow soon ...
 
