@@ -69,7 +69,7 @@ The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient
 
 You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and a test server (right side):
 
-[[https://github.com/Jallah/EasyProt/blob/master/docs/files/img/ClientServer.jpg|alt=ClientServer]]
+![alt tag](https://github.com/Jallah/EasyProt/blob/master/docs/files/img/ClientServer.jpg)
 
 Some more instructions will follow soon ...
 
