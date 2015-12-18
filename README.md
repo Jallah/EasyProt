@@ -73,9 +73,11 @@ You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Cli
 
 Some more instructions will follow soon ...
 
-## Build
+## How to Build
 
 Just run build.cmd for Windows or build.sh for Linux.
+
+A NuGet-Package is planned.
 
 ## TODO
 - Comments in EasyProt.Runtime.RuntimeManager(.fs)
