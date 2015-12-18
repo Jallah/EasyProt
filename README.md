@@ -65,7 +65,7 @@ let client = rntMngr.GetProtClient()
 // ...
 let server = rntMngr.GetProtServer()
 ```
-The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient`` and ``IProtServer`` implemenation instead of the default ones.
+The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient`` and ``IProtServer`` implemenation. Otherwise the default ones will be used (EasyProt/src/EasyProt.Runtime/Runtime.fs).
 
 You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and a test server (right side):
 
