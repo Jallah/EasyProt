@@ -73,12 +73,16 @@ You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Cli
 
 Some more instructions will follow soon ...
 
+## Build
+
+Just run build.cmd for Windows or build.sh for Linux.
+
 ## TODO
 - Comments in EasyProt.Runtime.RuntimeManager(.fs)
 - Complete Readme
 
 ## ISSUES
-- FAKE does not support NUNIT >=3: https://github.com/fsharp/FAKE/issues/1010
+- FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010
 
 
 
