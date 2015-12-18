@@ -36,7 +36,7 @@ abstract member Validate : message:string -> bool
 // C# Task HandleMessageAsync(string message)
 abstract member HandleMessageAsync : message:string -> Async<unit>
 ```
-The ``Validate()`` method ist responsible to determine the message. Let's look at a very simple implementation:
+The ``Validate()`` method is responsible to determine the message. Let's look at a very simple implementation:
 ``` fsharp
 let msg1 = 
     { new IProtMessage with
