@@ -44,7 +44,7 @@ The ``Validate()`` method ist responsible to determine the message. Let's look a
           member this.Validate message = message.[0] = '1'
           member this.HandleMessageAsync message = async { System.Console.WriteLine("msg1: " + message) } }
 ```
-So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows wich ``HandleMessageAsync()`` implementation or Pipeline should be called. This member is the counterpart to for the Pipeline.
+So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows wich ``HandleMessageAsync()`` implementation or Pipeline should be called. This member is the counterpart to the Pipeline.
 
 Some more instructions will follow soon ...
 
