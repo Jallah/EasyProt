@@ -58,6 +58,7 @@ rntMngr.RegisterMessageOut [member1 ; member2]  msg1 |> ignore
 rntMngr.RegisterMessage msg2 |> ignore
 // Register a message with an Incoming-Pipeline
 rntMngr.RegisterMessageInc [onServerResponse] serverResponse |> ignore
+// There is also a RegisterMessageIncOut
 ```
 After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
 ``` fsharp
