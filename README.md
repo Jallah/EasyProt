@@ -5,7 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/cyi4mev19l12jyya?svg=true)](https://ci.appveyor.com/project/Jallah/easyprot)
 
 ## Description
-EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usually you just have to define your messages by implementing the `IProtMessage ` interface. The communication between the Clients and the Sever runs asynchronus.
+EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usually you just have to define your messages by implementing the `IProtMessage ` interface. Some use case could be an instant messenger. The communication between the Clients and the Sever runs asynchronus. There are much things planned. This Framework is not yet complete.
 
 ## Usage
 There are much cool things you can do to create your own Protocol. EasyProt is written in F# but you can write your Implementation in every .NET Language even in VB .NET (don't take it too serious VB-Lovers :P). You can define a Pipeline (see below) for handling outgoing messages. You can even write your own implementation for the Client-Server-Communication by implementing the ``IProtClient`` and/or ``IProtServer`` interface. The default implementation uses a simple ``TcpClient`` with an unencrypted stream. But you can write your own implementation which uses a ``SslStream``.  Let's have a look at the main parts of this small Framework:
@@ -66,6 +66,42 @@ let client = rntMngr.GetProtClient()
 let server = rntMngr.GetProtServer()
 ```
 The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient`` and ``IProtServer`` implemenation. Otherwise the default ones will be used (EasyProt/src/EasyProt.Runtime/Runtime.fs).
+
+**Client and Server**
+
+Now you got the Client and Server you can start connecting them:
+
+*Note: This is just sample code to demonstate the usage. For reason of clarity the exception handling has been omitted.*
+
+``` fsharp
+// server side
+server.OnClientConnected.AddHandler(fun _ a ->
+
+  System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
+  let reader = new System.IO.StreamReader(a.Client.GetStream());
+  let writer = new System.IO.StreamWriter(a.Client.GetStream());
+ 
+   while true do
+      let msg = reader.ReadLine();
+      System.Console.WriteLine(msg);
+      writer.WriteLine("S " + msg + " got it")
+      writer.Flush())
+
+server.ListenForClientsAsync(8080)
+```
+
+``` fsharp
+// client side
+client.ConnectAsync("127.0.0.1", 8080).Wait()
+client.ListenAsync() |> ignore
+```
+Sending messages:
+
+``` fsharp
+// ...
+client.SendAsync("Hey dude!") |> ignore
+```
+
 
 You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and test server (right side):
 
