@@ -44,7 +44,7 @@ let msg1 =
     { new IProtMessage with
           member this.Validate message = message.[0] = '1'
 ```
-So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows which Pipeline be used for incoming or outgoing messages.
+So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows which Pipeline will be used for incoming or outgoing messages.
 
 **RuntimeManager**
 
