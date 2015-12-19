@@ -47,9 +47,9 @@ type IProtServer =
 type IProtMessage =
     /// This method is used to determine the message.
     abstract member Validate : message:string -> bool
-    // This methode will be called to handle incoming messages.
-    // Outgoing messages will be handled by the defined Pipeline wich you can register with RuntimeManager.RegisterMessage()
-    abstract member HandleMessageAsync : message:string -> Async<unit>
+//    // This methode will be called to handle incoming messages.
+//    // Outgoing messages will be handled by the defined Pipeline wich you can register with RuntimeManager.RegisterMessage()
+//    abstract member HandleMessageAsync : message:string -> Async<unit>
 
     
 

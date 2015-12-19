@@ -8,7 +8,7 @@
 EasyProt is a very lightwight Framwork for implementing your own Client-Server-Based Protocol. Usually you just have to define your messages by implementing the `IProtMessage ` interface. Some use case could be an instant messenger. The communication between the Clients and the Sever runs asynchronus. There are much things planned. This Framework is not yet complete.
 
 ## Usage
-There are much cool things you can do to create your own Protocol. EasyProt is written in F# but you can write your Implementation in every .NET Language even in VB .NET (don't take it too serious VB-Lovers :P). You can define a Pipeline (see below) for handling outgoing messages. You can even write your own implementation for the Client-Server-Communication by implementing the ``IProtClient`` and/or ``IProtServer`` interface. The default implementation uses a simple ``TcpClient`` with an unencrypted stream. But you can write your own implementation which uses a ``SslStream``.  Let's have a look at the main parts of this small Framework:
+There are much cool things you can do to create your own Protocol. EasyProt is written in F# but you can write your Implementation in every .NET Language even in VB .NET (don't take it too serious VB-Lovers :P). You can define a Pipeline (see below) for handling incoming messages and a Pipeline for outgoing messages. You can even write your own implementation for the Client-Server-Communication by implementing the ``IProtClient`` and/or ``IProtServer`` interface. The default implementation uses a simple ``TcpClient`` with an unencrypted stream. But you can write your own implementation which uses a ``SslStream``.  Let's have a look at the main parts of this small Framework:
 
 **IPipelineMember**
 
@@ -26,6 +26,10 @@ let member1 =
 let member2 = 
     { new IPipelineMember with
           member this.Proceed input = "XX" + input }
+
+let onServerResponse = { new IPipelineMember with 
+                                member this.Proceed input = System.Console.WriteLine("ServerResponse: " + input)
+                                                            input} 
 ```
 The result of this pipeline will be a string with leading and trailing **"XX"** (see screenshot below). Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
 
@@ -33,17 +37,14 @@ The result of this pipeline will be a string with leading and trailing **"XX"** 
 ``` fsharp
 // C# bool Validate(string message)
 abstract member Validate : message:string -> bool
-// C# Task HandleMessageAsync(string message)
-abstract member HandleMessageAsync : message:string -> Async<unit>
 ```
 The ``Validate()`` method is responsible to determine the message. Let's look at a very simple implementation:
 ``` fsharp
 let msg1 = 
     { new IProtMessage with
           member this.Validate message = message.[0] = '1'
-          member this.HandleMessageAsync message = async { System.Console.WriteLine("msg1: " + message) } }
 ```
-So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows wich ``HandleMessageAsync()`` implementation or Pipeline should be called. This member is the counterpart to the Pipeline.
+So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows which Pipeline be used for incoming or outgoing messages.
 
 **RuntimeManager**
 
@@ -51,9 +52,12 @@ After defining your messages and pipelines you should use the ``RuntimeManager``
 
 ``` fsharp
 let rntMngr = new EasyProt.Runtime.RuntimeManager()
-rntMngr.RegisterMessage(member1 :: member2 :: [], msg1) |> ignore
-rntMngr.RegisterMessage(msg2) |> ignore // use default pipeline -> input == output
-rntMngr.RegisterMessage(msg3) |> ignore
+// Register a message with an OutGoing-Pipeline
+rntMngr.RegisterMessageOut [member1 ; member2]  msg1 |> ignore
+// Register a message with default-In- and default-Out-Pipeline
+rntMngr.RegisterMessage msg2 |> ignore
+// Register a message with an Incoming-Pipeline
+rntMngr.RegisterMessageInc [onServerResponse] serverResponse |> ignore
 ```
 After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
 ``` fsharp
@@ -99,7 +103,7 @@ Sending messages:
 
 ``` fsharp
 // ...
-client.SendAsync("Hey dude!") |> ignore
+client.SendAsync("Hey, dude!") |> ignore
 ```
 
 

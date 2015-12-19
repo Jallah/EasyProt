@@ -46,17 +46,18 @@ type DefaultProtClient() =
                 do this.DisposeStream()
                 do tcpClient <- new TcpClient()
                 do! awaitTaskVoid (tcpClient.ConnectAsync(host = ip, port = port))
-                do streamWriter <- new StreamWriter(tcpClient.GetStream())
+                //do streamWriter <- new StreamWriter(tcpClient.GetStream())
             }
         
         member this.SendAsync message = 
             match tcpClient.Connected with
             | true -> 
-                async { 
-                    do! awaitTaskVoid (streamWriter.WriteLineAsync(message.ToString()))
-                    do! awaitTaskVoid (streamWriter.FlushAsync())
+                async {
+                    let writer = new StreamWriter(tcpClient.GetStream())
+                    do! awaitTaskVoid (writer.WriteLineAsync(message.ToString()))
+                    do! awaitTaskVoid (writer.FlushAsync())
                 }
-            | _ -> failwith "client not connected"
+            | _ -> failwith "Client not connected"
         
         member this.DisconnectAsync = async { do tcpClient.Close() }
     
