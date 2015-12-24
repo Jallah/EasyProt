@@ -31,6 +31,30 @@ let onServerResponse = { new IPipelineMember with
                                 member this.Proceed input = System.Console.WriteLine("ServerResponse: " + input)
                                                             input} 
 ```
+
+Of if you like C#:
+
+``` csharp
+public class member1 : IPipelineMember
+{
+    public string Proceed(string input) => input + "XX";
+}
+
+public class member2 : IPipelineMember
+{
+    public string Proceed(string input) => "XX" + input;
+}
+
+puplic class onServerResponse : IPipelineMember
+{
+    public string Proceed(string input)
+    {
+        System.Console.WriteLine("ServerResponse: " + input);
+        return input;
+    }
+}
+```
+
 The result of these pipeline members (member1, member2) will be a string with leading and trailing **"XX"** (see screenshot below). The third one (onServerResponse) just writes the response to the console. Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
 
 **IProtMessage**
@@ -39,10 +63,19 @@ The result of these pipeline members (member1, member2) will be a string with le
 abstract member Validate : message:string -> bool
 ```
 The ``Validate()`` method is responsible to determine the message. Let's look at a very simple implementation:
+
+F#
 ``` fsharp
 let msg1 = 
     { new IProtMessage with
           member this.Validate message = message.[0] = '1'
+```
+C#
+``` csharp
+public class msg1 : IProtMessage
+{
+    public bool Validate(string message) => message[0] == '1';
+}
 ```
 So every time when the first sign of an incoming message is a **_1_** the Client or Server (depending on where you register your messages) knows which Pipeline will be used for incoming or outgoing messages.
 
@@ -50,6 +83,7 @@ So every time when the first sign of an incoming message is a **_1_** the Client
 
 After defining your messages and pipelines you should use the ``RuntimeManager`` as follows:
 
+F#
 ``` fsharp
 let rntMngr = new EasyProt.Runtime.RuntimeManager()
 // Register a message with an OutGoing-Pipeline
@@ -60,14 +94,27 @@ rntMngr.RegisterMessage msg2 |> ignore
 rntMngr.RegisterMessageInc [onServerResponse] serverResponse |> ignore
 // There is also a RegisterMessageIncOut
 ```
+C#
+``` csharp
+var rntMngr = new EasyProt.Runtime.RuntimeManager()
+// Register a message with an OutGoing-Pipeline
+rntMngr.RegisterMessageOut(new List<IPipelineMember>{member1 ; member2},  msg1); 
+// Register a message with default-In- and default-Out-Pipeline
+rntMngr.RegisterMessage(msg2);
+// Register a message with an Incoming-Pipeline
+rntMngr.RegisterMessageInc(new List<IPipelineMember>{onServerResponse}, serverResponse);
+// There is also a RegisterMessageIncOut
+```
 After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
 ``` fsharp
 // ...
+// C# var client = rntMngr.GetProtClient()
 let client = rntMngr.GetProtClient()
 ```
 
 ``` fsharp
 // ...
+// C# var server = rntMngr.GetProtServer()
 let server = rntMngr.GetProtServer()
 ```
 The ``RuntimeManager``-ctor is overloaded so you can pass your own ``IProtClient`` and ``IProtServer`` implemenation. Otherwise the default ones will be used (EasyProt/src/EasyProt.Runtime/Runtime.fs).
@@ -78,8 +125,8 @@ Now you got the Client and Server you can start connecting them:
 
 *Note: This is just sample code to demonstate the usage. For reason of clarity the exception handling has been omitted.*
 
+F# Server-side
 ``` fsharp
-// server side
 server.OnClientConnected.AddHandler(fun _ a ->
 
   System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
@@ -94,19 +141,42 @@ server.OnClientConnected.AddHandler(fun _ a ->
 
 server.ListenForClientsAsync(8080)
 ```
-
+F# Client-side
 ``` fsharp
-// client side
 client.ConnectAsync("127.0.0.1", 8080).Wait()
 client.ListenAsync() |> ignore
 ```
+C# Slient-Side
+``` csharp
+server.OnClientConnected += (sender, args) ->
+{
+    System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
+    var reader = new System.IO.StreamReader(a.Client.GetStream());
+    var writer = new System.IO.StreamWriter(a.Client.GetStream());
+ 
+    while(true)
+    {
+        var msg = reader.ReadLine();
+        System.Console.WriteLine(msg);
+        writer.WriteLine("S " + msg + " got it")
+        writer.Flush())
+    }
+}
+server.ListenForClientsAsync(8080)
+```
+C# Client-Side
+``` csharp
+client.ConnectAsync("127.0.0.1", 8080).Wait()
+client.ListenAsync();
+```
+
 Sending messages:
 
 ``` fsharp
 // ...
+// C# client.SendAsync("Hey, dude!")
 client.SendAsync("Hey, dude!") |> ignore
 ```
-
 
 You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and test server (right side):
 
