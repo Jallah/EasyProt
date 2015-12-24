@@ -150,7 +150,7 @@ client.ListenAsync() |> ignore
 ```
 **C# Server-side**
 ``` csharp
-server.OnClientConnected += (sender, args) ->
+server.OnClientConnected += (sender, args) =>
 {
     System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
     var reader = new System.IO.StreamReader(a.Client.GetStream());
