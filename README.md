@@ -35,17 +35,18 @@ let onServerResponse = { new IPipelineMember with
 Or if you like C#:
 
 ``` csharp
-public class member1 : IPipelineMember
+// ...
+class member1 : IPipelineMember
 {
     public string Proceed(string input) => input + "XX";
 }
-
-public class member2 : IPipelineMember
+// ...
+class member2 : IPipelineMember
 {
     public string Proceed(string input) => "XX" + input;
 }
-
-puplic class onServerResponse : IPipelineMember
+// ...
+class onServerResponse : IPipelineMember
 {
     public string Proceed(string input)
     {
@@ -53,6 +54,7 @@ puplic class onServerResponse : IPipelineMember
         return input;
     }
 }
+// ...
 ```
 
 The result of these pipeline members (member1, member2) will be a string with leading and trailing **"XX"** (see screenshot below). The third one (onServerResponse) just writes the response to the console. Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
