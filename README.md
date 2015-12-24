@@ -32,7 +32,7 @@ let onServerResponse = { new IPipelineMember with
                                                             input} 
 ```
 
-Of if you like C#:
+Or if you like C#:
 
 ``` csharp
 public class member1 : IPipelineMember
