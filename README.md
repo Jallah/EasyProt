@@ -66,13 +66,13 @@ abstract member Validate : message:string -> bool
 ```
 The ``Validate()`` method is responsible to determine the message. Let's look at a very simple implementation:
 
-##### F#
+**F#**
 ``` fsharp
 let msg1 = 
     { new IProtMessage with
           member this.Validate message = message.[0] = '1'
 ```
-##### C#
+**C#**
 ``` csharp
 public class msg1 : IProtMessage
 {
@@ -85,7 +85,7 @@ So every time when the first sign of an incoming message is a **_1_** the Client
 
 After defining your messages and pipelines you should use the ``RuntimeManager`` as follows:
 
-##### F#
+**F#**
 ``` fsharp
 let rntMngr = new EasyProt.Runtime.RuntimeManager()
 // Register a message with an OutGoing-Pipeline
@@ -96,7 +96,7 @@ rntMngr.RegisterMessage msg2 |> ignore
 rntMngr.RegisterMessageInc [onServerResponse] serverResponse |> ignore
 // There is also a RegisterMessageIncOut
 ```
-##### C#
+**C#**
 ``` csharp
 var rntMngr = new EasyProt.Runtime.RuntimeManager()
 // Register a message with an OutGoing-Pipeline
@@ -127,7 +127,7 @@ Now you got the Client and Server you can start connecting them:
 
 *Note: This is just sample code to demonstate the usage. For reason of clarity the exception handling has been omitted.*
 
-##### F# Server-side
+**F# Server-side**
 ``` fsharp
 server.OnClientConnected.AddHandler(fun _ a ->
 
@@ -143,12 +143,12 @@ server.OnClientConnected.AddHandler(fun _ a ->
 
 server.ListenForClientsAsync(8080)
 ```
-##### F# Client-side
+**F# Client-side**
 ``` fsharp
 client.ConnectAsync("127.0.0.1", 8080).Wait()
 client.ListenAsync() |> ignore
 ```
-##### C# Server-side
+**C# Server-side**
 ``` csharp
 server.OnClientConnected += (sender, args) ->
 {
@@ -166,13 +166,13 @@ server.OnClientConnected += (sender, args) ->
 }
 server.ListenForClientsAsync(8080)
 ```
-##### C# Client-Side
+**C# Client-Side**
 ``` csharp
 client.ConnectAsync("127.0.0.1", 8080).Wait()
 client.ListenAsync();
 ```
 
-##### Sending messages:
+**Sending messages:**
 
 ``` fsharp
 // ...
