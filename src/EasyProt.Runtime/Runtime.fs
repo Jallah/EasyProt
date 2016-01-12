@@ -46,7 +46,6 @@ type DefaultProtClient() =
                 do this.DisposeStream()
                 do tcpClient <- new TcpClient()
                 do! awaitTaskVoid (tcpClient.ConnectAsync(host = ip, port = port))
-                //do streamWriter <- new StreamWriter(tcpClient.GetStream())
             }
         
         member this.SendAsync message = 

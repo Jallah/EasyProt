@@ -6,7 +6,7 @@ open EasyProt.Core
 
 
 [<Test>]
-let ``should return XXhalloXX`` () = /// Fails Missing Methode Exception ?!
+let ``should return XXhalloXX`` () =
   let pipeline = new Pipeline()
   let member1 = {new IPipelineMember with
                     member this.Proceed input = input + "XX"}
