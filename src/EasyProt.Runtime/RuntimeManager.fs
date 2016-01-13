@@ -14,8 +14,7 @@ type Client(protClient : IProtClient, pipe : (IPipelineMember list * IPipelineMe
         | Some(_, outPipeline, _) -> async { 
                                          //get the pipeline result --> feed the pipe
                                          let! pipelineResult = (new Pipeline() :> IPipeline).RunAsync outPipeline msg
-                                         do! protClient.SendAsync pipelineResult } //do System.Console.WriteLine(pipelineResult)
-                                                                                   |> Async.StartAsTask
+                                         do! protClient.SendAsync pipelineResult } |> Async.StartAsTask
         | None -> failwith "No matching pipelinemember(s) or default pipelinemember(s) found" //TODO: Resources
     
     member this.ListenAsync() = protClient.ListenForMessageAsync |> Async.StartAsTask
