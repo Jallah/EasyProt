@@ -23,6 +23,8 @@
 open EasyProt.Runtime
 open EasyProt.Core
 
+//TODO: add some tests how to use a pipeline on the server-side
+
 [<EntryPoint>]
 let main argv = 
     let manager = new RuntimeManager()
