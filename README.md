@@ -193,8 +193,10 @@ Just run build.cmd for Windows or build.sh for Linux.
 A NuGet-Package is planned.
 
 ## TODO
-- Comments in EasyProt.Runtime.RuntimeManager(.fs)
-- Complete Readme
+- Make it possible to register messages on the server side
+- Make it possible to register a default handler for unknown messages
+- IPipelineMemberInc: (Stream -> string -> string) so you can respond
+- Make it possible to register a message
 
 ## ISSUES
 - FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010
