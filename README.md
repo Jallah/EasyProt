@@ -186,7 +186,7 @@ You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Cli
 
 Some more instructions will follow soon ...
 
-## How to Build
+## How to build
 
 Just run build.cmd for Windows or build.sh for Linux.
 
@@ -196,7 +196,7 @@ A NuGet-Package is planned.
 - Make it possible to register messages on the server side
 - Make it possible to register a default handler for unknown messages
 - IPipelineMemberInc: (Stream -> string -> string) so you can respond
-- Make it possible to register a message
+- Make it possible to reregister a message
 
 ## ISSUES
 - FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010
