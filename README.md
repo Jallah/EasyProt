@@ -64,6 +64,7 @@ The result of these pipeline members (member1, member2) will be a string with le
 If you want to write a response after an icoming message you can write an ``IPipelineResponder``. The containing ``Response`` methode gets the pipeline result and a ``StreamWriter``.
 Let's look at a simple implementation. Also have a look at the ``EasyProt.TestServer`` project to see it in action.
 
+**F#**
 ``` fsharp
 let pipeResponder =
         { new IPipelineResponder with
@@ -75,9 +76,24 @@ let pipeResponder =
                 }}
 ```
 
-A C# example will follow.
+**C#**
+``` csharp
+public class Responder : IPipelineResponder
+{
+    public FSharpAsync<Unit> Response(string res, StreamWriter writer)
+    {
+        Helper.awaitTaskVoid(writer.WriteLineAsync(""));
+        Helper.awaitTaskVoid(writer.FlushAsync());
+
+        return null;
+    }
+}
+```
+
+Some interoperability code is planned so you don't have to add a reference to FSharp.Core to your C# project.
 
 **IProtMessage**
+
 ``` fsharp
 // C# bool Validate(string message)
 abstract member Validate : message:string -> bool
@@ -213,7 +229,8 @@ A NuGet-Package is planned.
 ## TODO
 - Make it possible to register messages on the server side
 - Make it possible to register a default handler for unknown messages
-- Make it possible to reregister a message
+- Make it possible to reRegister a message
+- Add some interOp code so you dont't have to add a ref to FSharp.Core to your C# project
 
 ## ISSUES
 - FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010
