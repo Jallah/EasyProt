@@ -15,7 +15,7 @@ namespace EasyProt.CSharpInterOpTest
     {
         public FSharpAsync<Unit> Response(string res, StreamWriter writer)
         {
-            Helper.awaitTaskVoid(writer.WriteLineAsync(""));
+            Helper.awaitTaskVoid(writer.WriteLineAsync("S " + res + " got it"));
             Helper.awaitTaskVoid(writer.FlushAsync());
 
             return null;
