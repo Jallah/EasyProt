@@ -213,7 +213,6 @@ A NuGet-Package is planned.
 ## TODO
 - Make it possible to register messages on the server side
 - Make it possible to register a default handler for unknown messages
-- IPipelineMemberInc: (Stream -> string -> string) so you can respond
 - Make it possible to reregister a message
 
 ## ISSUES
