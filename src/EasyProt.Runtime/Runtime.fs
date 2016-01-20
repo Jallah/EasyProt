@@ -4,7 +4,7 @@ open EasyProt.Core
 
 type Pipeline() = 
     interface IPipeline with
-        member this.RunAsync pipelineMember = 
+        member __.RunAsync pipelineMember = 
             let pipe = 
                 pipelineMember
                 |> List.map (fun m -> m.Proceed)
@@ -21,7 +21,7 @@ type DefaultProtClient() =
     let mutable streamWriter : StreamWriter = Unchecked.defaultof<StreamWriter>
     let incomingMessageEvent = new Event<IngomingMessageDelegate, IncomingMessageEventArgs>()
     
-    member private this.DisposeStream() = 
+    member private __.DisposeStream() = 
         match streamWriter with
         | null -> ()
         | _ -> streamWriter.Close()
@@ -29,7 +29,7 @@ type DefaultProtClient() =
     interface IProtClient with
         
         [<CLIEvent>]
-        member this.OnIncomingMessage = incomingMessageEvent.Publish
+        member __.OnIncomingMessage = incomingMessageEvent.Publish
         
         member this.ListenForMessageAsync = 
             async { 
@@ -37,7 +37,7 @@ type DefaultProtClient() =
                 use streamReader = new StreamReader(stream)
                 while true do
                     let! line = streamReader.ReadLineAsync() |> Async.AwaitTask
-                    incomingMessageEvent.Trigger(this, new IncomingMessageEventArgs(line))
+                    incomingMessageEvent.Trigger(this, new IncomingMessageEventArgs(line, stream))
                     ()
             }
         
@@ -48,7 +48,7 @@ type DefaultProtClient() =
                 do! awaitTaskVoid (tcpClient.ConnectAsync(host = ip, port = port))
             }
         
-        member this.SendAsync message = 
+        member __.SendAsync message = 
             match tcpClient.Connected with
             | true -> 
                 async {
@@ -58,7 +58,7 @@ type DefaultProtClient() =
                 }
             | _ -> failwith "Client not connected"
         
-        member this.DisconnectAsync = async { do tcpClient.Close() }
+        member __.DisconnectAsync = async { do tcpClient.Close() }
     
     interface System.IDisposable with
         member this.Dispose() = this.DisposeStream()
@@ -69,7 +69,7 @@ type DefaultProtServer() =
     interface IProtServer with
         
         [<CLIEvent>]
-        member this.OnClientConnected = clientConnectedEvent.Publish
+        member __.OnClientConnected = clientConnectedEvent.Publish
         
         member this.ListenForClientsAsync port = 
             async { 

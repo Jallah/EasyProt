@@ -22,6 +22,7 @@
 
 open EasyProt.Runtime
 open EasyProt.Core
+open Helper
 
 //TODO: add some tests how to use a pipeline on the server-side
 
@@ -34,35 +35,39 @@ let main argv =
     //TODO: For inc messages --> IPipelineMemberInc.Procced: Stream string -> string
 
 
-    let incMsgHandler =
-        { new IPipelineMember with
-          member this.Proceed message = "S " + message + " got it"}
+//    let incMsgHandler =
+//        { new IPipelineMember with
+//          member __.Proceed message = }
     
     let incMsg = 
         { new IProtMessage with
-          member this.Validate message = message.[0] = 'X'}
+          member __.Validate message = message.[0] = 'X'}
 
-    let pipe = new Pipeline() :> IPipeline
+    let pipeResponder =
+        { new IPipelineResponder with
+          member __.Response pipeResult writer =
+            let response = "S " + pipeResult + " got it"
+            async { 
+                do! writer.WriteLineAsync(response) |> awaitTaskVoid
+                do! writer.FlushAsync() |> awaitTaskVoid
+                }}
+
+    //let pipe = new Pipeline() :> IPipeline
 
     
 
     server.OnClientConnected.AddHandler(fun _ a ->
-    
                  System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
-
-                 
-
                  let reader = new System.IO.StreamReader(a.Client.GetStream());
                  let writer = new System.IO.StreamWriter(a.Client.GetStream());
  
                  while true do
                     let msg = reader.ReadLine();
                     System.Console.WriteLine(msg);
+                    if incMsg.Validate(msg) then pipeResponder.Response msg writer |> Async.RunSynchronously
 
-                    if incMsg.Validate(msg) then writer.WriteLine(incMsgHandler.Proceed msg)
                     else writer.WriteLine("S unknow message")
-
-                    writer.Flush()
+                         writer.Flush()
                )
 
     server.ListenForClientsAsync(8080)

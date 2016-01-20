@@ -10,11 +10,11 @@ module Program
 
 open EasyProt.Core
 
-let member1 = 
+let outMember1 = 
     { new IPipelineMember with
           member this.Proceed input = input + "XX" }
 
-let member2 = 
+let outMember2 = 
     { new IPipelineMember with
           member this.Proceed input = "XX" + input }
 
@@ -41,11 +41,11 @@ let main argv =
     let rntMngr = new EasyProt.Runtime.RuntimeManager()
 
     // Register a message with an OutGoing-Pipeline
-    rntMngr.RegisterMessageOut [member1 ; member2]  msg1 |> ignore
+    rntMngr.RegisterMessageOut [outMember1 ; outMember2] msg1 None |> ignore
     // Register a message with default-In- and default-Out-Pipeline
-    rntMngr.RegisterMessage msg2 |> ignore
+    rntMngr.RegisterMessage msg2 None |> ignore
     // Register a message with an Incoming-Pipeline
-    rntMngr.RegisterMessageInc [onServerResponse] serverResponse |> ignore
+    rntMngr.RegisterMessageInc [onServerResponse] serverResponse None |> ignore
 
     let client = rntMngr.GetProtClient()
 
@@ -54,7 +54,7 @@ let main argv =
 
     while true do
         let msg = System.Console.ReadLine()
-        client.SendAsync(msg) |> ignore
+        client.SendAsync(msg) |> Async.AwaitTask |> ignore
 
     System.Console.ReadLine() |> ignore
     0

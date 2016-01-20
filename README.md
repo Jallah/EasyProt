@@ -59,6 +59,24 @@ class onServerResponse : IPipelineMember
 
 The result of these pipeline members (member1, member2) will be a string with leading and trailing **"XX"** (see screenshot below). The third one (onServerResponse) just writes the response to the console. Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
 
+**IPipelineResponder**
+
+If you want to write a response after an icoming message you can write an ``IPipelineResponder``. The containing ``Response`` methode gets the pipeline result and a ``StreamWriter``.
+Let's look at a simple implementation. Also have a look at the ``EasyProt.TestServer`` project to see it in action.
+
+``` fsharp
+let pipeResponder =
+        { new IPipelineResponder with
+          member __.Response pipeResult writer =
+            let response = "S " + pipeResult + " got it"
+            async { 
+                do! writer.WriteLineAsync(response) |> awaitTaskVoid
+                do! writer.FlushAsync() |> awaitTaskVoid
+                }}
+```
+
+A C# example will follow.
+
 **IProtMessage**
 ``` fsharp
 // C# bool Validate(string message)
@@ -89,22 +107,22 @@ After defining your messages and pipelines you should use the ``RuntimeManager``
 ``` fsharp
 let rntMngr = new EasyProt.Runtime.RuntimeManager()
 // Register a message with an OutGoing-Pipeline
-rntMngr.RegisterMessageOut [member1 ; member2]  msg1 |> ignore
+rntMngr.RegisterMessageOut [member1 ; member2] msg1 None |> ignore
 // Register a message with default-In- and default-Out-Pipeline
-rntMngr.RegisterMessage msg2 |> ignore
+rntMngr.RegisterMessage msg2 None |> ignore
 // Register a message with an Incoming-Pipeline
-rntMngr.RegisterMessageInc [onServerResponse] serverResponse |> ignore
+rntMngr.RegisterMessageInc [onServerResponse] serverResponse  None|> ignore
 // There is also a RegisterMessageIncOut
 ```
 **C#**
 ``` csharp
 var rntMngr = new EasyProt.Runtime.RuntimeManager()
 // Register a message with an OutGoing-Pipeline
-rntMngr.RegisterMessageOut(new List<IPipelineMember>{member1 ; member2},  msg1); 
+rntMngr.RegisterMessageOut(new List<IPipelineMember>{member1 ; member2},  msg1, Microsoft.FSharp.Core.Option<IPipelineResponder>.None); 
 // Register a message with default-In- and default-Out-Pipeline
-rntMngr.RegisterMessage(msg2);
+rntMngr.RegisterMessage(msg2, Microsoft.FSharp.Core.Option<IPipelineResponder>.None);
 // Register a message with an Incoming-Pipeline
-rntMngr.RegisterMessageInc(new List<IPipelineMember>{onServerResponse}, serverResponse);
+rntMngr.RegisterMessageInc(new List<IPipelineMember>{onServerResponse}, serverResponse, Microsoft.FSharp.Core.Option<IPipelineResponder>.None);
 // There is also a RegisterMessageIncOut
 ```
 After registering your messages you can let the RuntimeManager Create the Client and/or Server for you:
