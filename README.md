@@ -169,9 +169,13 @@ open EasyProt.Runtime
 open EasyProt.Core
 open Helper
 
-let incMsg = 
+let incMsg1 = 
     { new IProtMessage with
           member __.Validate message = message.[0] = 'X' }
+
+let incMsg2 = 
+    { new IProtMessage with
+          member __.Validate message = message.[0] = '2' }
 
 let log = 
     { new IPipelineMember with
@@ -193,7 +197,8 @@ let pipeResponder =
 
 let server = 
     let mngr = new RuntimeManager()
-    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg (Some(pipeResponder))
+    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg1 (Some(pipeResponder))
+    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg2 (Some(pipeResponder))
     mngr.GetProtServer()
 
 [<EntryPoint>]
@@ -297,6 +302,7 @@ A NuGet-Package is planned.
 - Add some interOp code so you dont't have to add a ref to FSharp.Core to your C# project
 - Add C# exaples to README
 - Fix mono build failure
+- Add a flow chart image for the communication
 
 ## ISSUES
 - FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010

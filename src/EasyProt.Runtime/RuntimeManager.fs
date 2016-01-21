@@ -75,7 +75,7 @@ type Server(protServer : IProtServer,
                                                                                 | pipe -> let! outPipeResult = (new Pipeline() :> IPipeline).RunAsync pipe inPipeResult // or msg ???
                                                                                           do! resp.ResponseAsync outPipeResult (new StreamWriter(stream))
                                                                 | _ -> ()}
-                                                          | None -> failwith "No matching pipelinemember(s) or default pipelinemember(s) found" //TODO: Resources
+                                                          | None -> failwith "No matching pipelinemember(s) or default pipelinemember found" //TODO: Resources
 
     member private this.OnIncomingConnectionHanlder((_: obj), a: ClientConnectedEventArgs) =
 

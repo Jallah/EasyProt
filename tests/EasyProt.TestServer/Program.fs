@@ -4,9 +4,13 @@ open EasyProt.Runtime
 open EasyProt.Core
 open Helper
 
-let incMsg = 
+let incMsg1 = 
     { new IProtMessage with
           member __.Validate message = message.[0] = 'X' }
+
+let incMsg2 = 
+    { new IProtMessage with
+          member __.Validate message = message.[0] = '2' }
 
 let log = 
     { new IPipelineMember with
@@ -28,7 +32,8 @@ let pipeResponder =
 
 let server = 
     let mngr = new RuntimeManager()
-    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg (Some(pipeResponder))
+    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg1 (Some(pipeResponder))
+    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg2 (Some(pipeResponder))
     mngr.GetProtServer()
 
 [<EntryPoint>]
