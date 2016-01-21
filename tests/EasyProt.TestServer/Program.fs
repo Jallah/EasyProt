@@ -35,7 +35,7 @@ let server =
 let main argv = 
     server.OnClientConnected.AddHandler(fun _ a -> 
         let networkStream = a.ClientStream :?> System.Net.Sockets.NetworkStream
-        // so something with the networkstream
+        // do something with the networkstream
         System.Console.WriteLine("inc con"))
     server.ListenForClientsAsync(8080)
     System.Console.ReadLine() |> ignore

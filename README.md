@@ -200,7 +200,7 @@ let server =
 let main argv = 
     server.OnClientConnected.AddHandler(fun _ a -> 
         let networkStream = a.ClientStream :?> System.Net.Sockets.NetworkStream
-        // so something with the networkstream
+        // do something with the networkstream
         System.Console.WriteLine("inc con"))
     server.ListenForClientsAsync(8080)
     System.Console.ReadLine() |> ignore
@@ -296,6 +296,7 @@ A NuGet-Package is planned.
 - Make it possible to reRegister a message
 - Add some interOp code so you dont't have to add a ref to FSharp.Core to your C# project
 - Add C# exaples to README
+- Fix mono build failure
 
 ## ISSUES
 - FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010
