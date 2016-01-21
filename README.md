@@ -163,58 +163,123 @@ Now you got the Client and Server you can start connecting them:
 
 **F# Server-side**
 ``` fsharp
-server.OnClientConnected.AddHandler(fun _ a ->
+module Program
 
-  System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
-  let reader = new System.IO.StreamReader(a.Client.GetStream());
-  let writer = new System.IO.StreamWriter(a.Client.GetStream());
- 
-   while true do
-      let msg = reader.ReadLine();
-      System.Console.WriteLine(msg);
-      writer.WriteLine("S " + msg + " got it")
-      writer.Flush())
+open EasyProt.Runtime
+open EasyProt.Core
+open Helper
 
-server.ListenForClientsAsync(8080)
+let incMsg = 
+    { new IProtMessage with
+          member __.Validate message = message.[0] = 'X' }
+
+let log = 
+    { new IPipelineMember with
+          member __.Proceed input = 
+              System.Console.WriteLine(input)
+              input }
+
+let outMsgHandler = 
+    { new IPipelineMember with
+          member __.Proceed input = "S " + input + " got it" }
+
+let pipeResponder = 
+    { new IPipelineResponder with
+          member __.ResponseAsync inPipeResult writer = 
+              async { 
+                  do! writer.WriteLineAsync(inPipeResult) |> awaitTaskVoid
+                  do! writer.FlushAsync() |> awaitTaskVoid
+              } }
+
+let server = 
+    let mngr = new RuntimeManager()
+    mngr.RegisterMessageOut [ outMsgHandler; log ] incMsg (Some(pipeResponder))
+    mngr.GetProtServer()
+
+[<EntryPoint>]
+let main argv = 
+    server.OnClientConnected.AddHandler(fun _ a -> 
+        let networkStream = a.ClientStream :?> System.Net.Sockets.NetworkStream
+        // so something with the networkstream
+        System.Console.WriteLine("inc con"))
+    server.ListenForClientsAsync(8080)
+    System.Console.ReadLine() |> ignore
+    0
 ```
 **F# Client-side**
 ``` fsharp
-client.ConnectAsync("127.0.0.1", 8080).Wait()
-client.ListenAsync() |> ignore
+module Program
+
+open EasyProt.Core
+
+let outMember1 = 
+    { new IPipelineMember with
+          member this.Proceed input = input + "XX" }
+
+let outMember2 = 
+    { new IPipelineMember with
+          member this.Proceed input = "XX" + input }
+
+let onServerResponse = 
+    { new IPipelineMember with
+          member this.Proceed input = 
+              System.Console.WriteLine("ServerResponse: " + input)
+              input }
+
+let msg1 = 
+    { new IProtMessage with
+          member this.Validate message = message.[0] = '1' }
+
+let msg2 = 
+    { new IProtMessage with
+          member this.Validate message = message.[0] = '2' }
+
+let serverResponse = 
+    { new IProtMessage with
+          member this.Validate message = message.[0] = 'S' }
+
+[<EntryPoint>]
+let main argv = 
+    let rntMngr = new EasyProt.Runtime.RuntimeManager()
+    // Register a message with an OutGoing-Pipeline
+    rntMngr.RegisterMessageOut [ outMember1; outMember2 ] msg1 None |> ignore
+    // Register a message with default-In- and default-Out-Pipeline
+    rntMngr.RegisterMessage msg2 None |> ignore
+    // Register a message with an Incoming-Pipeline
+    rntMngr.RegisterMessageInc [ onServerResponse ] serverResponse None |> ignore
+    let client = rntMngr.GetProtClient()
+    client.ConnectAsync("127.0.0.1", 8080).Wait()
+    client.ListenAsync() |> ignore
+    while true do
+        let msg = System.Console.ReadLine()
+        client.SendAsync(msg)
+        |> Async.AwaitTask
+        |> ignore
+    System.Console.ReadLine() |> ignore
+    0
+
+```
+**C# Client-side**
+``` csharp
+// will follow
 ```
 **C# Server-side**
 ``` csharp
-server.OnClientConnected += (sender, args) =>
-{
-    System.Console.WriteLine("inc con: " + a.Client.Client.RemoteEndPoint.ToString());
-    var reader = new System.IO.StreamReader(a.Client.GetStream());
-    var writer = new System.IO.StreamWriter(a.Client.GetStream());
- 
-    while(true)
-    {
-        var msg = reader.ReadLine();
-        System.Console.WriteLine(msg);
-        writer.WriteLine("S " + msg + " got it")
-        writer.Flush())
-    }
-}
-server.ListenForClientsAsync(8080)
+// will follow
 ```
-**C# Client-Side**
-``` csharp
-client.ConnectAsync("127.0.0.1", 8080).Wait()
-client.ListenAsync();
-```
-
 **Sending messages:**
-
 ``` fsharp
 // ...
-// C# client.SendAsync("Hey, dude!")
+// F#
 client.SendAsync("Hey, dude!") |> ignore
 ```
+``` csharp
+// ...
+// C#
+client.SendAsync("Hey, dude!")
+```
 
-You can find this samples in EasyProt/tests/EasyProt.ConsoleTest/Program.fs (Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and test server (right side):
+You can find this samples in EasyProt/tests/EasyProt.TestClient/Program.fs(Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and test server (right side):
 
 ![alt tag](https://github.com/Jallah/EasyProt/blob/master/docs/files/img/ClientServer.jpg)
 
@@ -227,10 +292,10 @@ Just run build.cmd for Windows or build.sh for Linux.
 A NuGet-Package is planned.
 
 ## TODO
-- Make it possible to register messages on the server side
 - Make it possible to register a default handler for unknown messages
 - Make it possible to reRegister a message
 - Add some interOp code so you dont't have to add a ref to FSharp.Core to your C# project
+- Add C# exaples to README
 
 ## ISSUES
 - FAKE does not support NUNIT >=3 yet: https://github.com/fsharp/FAKE/issues/1010

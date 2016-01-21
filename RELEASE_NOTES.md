@@ -1,3 +1,7 @@
+### 0.0.3
+
+ *Ability to register messages on the server side including in- and outPipelines
+
 ### 0.0.2
 
  * Framework is now able to create a Protocol

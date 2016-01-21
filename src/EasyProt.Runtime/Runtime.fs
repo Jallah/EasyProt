@@ -77,5 +77,5 @@ type DefaultProtServer() =
                 listener.Start()
                 while true do
                     let! client = listener.AcceptTcpClientAsync() |> Async.AwaitTask
-                    clientConnectedEvent.Trigger(this, new ClientConnectedEventArgs(client))
+                    clientConnectedEvent.Trigger(this, new ClientConnectedEventArgs(client.GetStream()))
             }

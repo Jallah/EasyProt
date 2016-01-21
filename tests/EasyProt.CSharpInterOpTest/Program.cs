@@ -13,7 +13,7 @@ namespace EasyProt.CSharpInterOpTest
 {
     public class Responder : IPipelineResponder
     {
-        public FSharpAsync<Unit> Response(string res, StreamWriter writer)
+        public FSharpAsync<Unit> ResponseAsync(string res, StreamWriter writer)
         {
             Helper.awaitTaskVoid(writer.WriteLineAsync("S " + res + " got it"));
             Helper.awaitTaskVoid(writer.FlushAsync());

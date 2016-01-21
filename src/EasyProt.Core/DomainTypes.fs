@@ -6,7 +6,7 @@ type IPipelineMember =
     abstract member Proceed : string -> string
 
 type IPipelineResponder =
-    abstract member Response: string -> System.IO.StreamWriter -> Async<unit>
+    abstract member ResponseAsync: string -> System.IO.StreamWriter -> Async<unit>
 
 type IPipeline =
    /// Runs the message Pipeline.
@@ -28,10 +28,10 @@ type IProtClient =
     abstract member DisconnectAsync: Async<unit>
     abstract member ListenForMessageAsync: Async<unit>
 
-type ClientConnectedEventArgs(client: System.Net.Sockets.TcpClient) =
+type ClientConnectedEventArgs(clientStream: System.IO.Stream) =
     inherit System.EventArgs()
-    let cl = client
-    member this.Client with get() = cl
+    let clStream = clientStream
+    member this.ClientStream with get() = clStream
     
 type ClientConnectedDelegate = delegate of obj * ClientConnectedEventArgs -> unit
 
