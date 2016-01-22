@@ -57,18 +57,18 @@ class onServerResponse : IPipelineMember
 // ...
 ```
 
-The result of these pipeline members (member1, member2) will be a string with leading and trailing **"XX"** (see screenshot below). The third one (onServerResponse) just writes the response to the console. Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing messages with no limits being set to your imagination :).
+The result of these pipeline members (member1, member2) will be a string with leading and trailing **"XX"** (see screenshot below). The third one (onServerResponse) just writes the response to the console. Some real world example could be a member which logs the message somewhere. Or a member could act as an insult filter wich detects bad words and converts it into **$%+!?#&** or whatever. Some other implementation could convert from one format to another e.g. from XML to Json. It's a very flexible way to do some stuff with your outgoing or incoming messages with no limits being set to your imagination :).
 
 **IPipelineResponder**
 
-If you want to write a response after an icoming message you can write an ``IPipelineResponder``. The containing ``Response`` methode gets the pipeline result and a ``StreamWriter``.
+If you want to write a response after an icoming message you can write an ``IPipelineResponder``. The containing ``ResponseAsync`` methode gets the pipeline result and a ``StreamWriter``.
 Let's look at a simple implementation. Also have a look at the ``EasyProt.TestServer`` project to see it in action.
 
 **F#**
 ``` fsharp
 let pipeResponder =
         { new IPipelineResponder with
-          member __.Response pipeResult writer =
+          member __.ResponseAsync pipeResult writer =
             let response = "S " + pipeResult + " got it"
             async { 
                 do! writer.WriteLineAsync(response) |> awaitTaskVoid
@@ -80,7 +80,7 @@ let pipeResponder =
 ``` csharp
 public class Responder : IPipelineResponder
 {
-    public FSharpAsync<Unit> Response(string res, StreamWriter writer)
+    public FSharpAsync<Unit> ResponseAsync(string res, StreamWriter writer)
     {
         Helper.awaitTaskVoid(writer.WriteLineAsync("S " + res + " got it"));
         Helper.awaitTaskVoid(writer.FlushAsync());
