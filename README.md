@@ -75,22 +75,22 @@ let pipeResponder =
                 do! writer.FlushAsync() |> awaitTaskVoid
                 }}
 ```
-
 **C#**
 ``` csharp
-public class Responder : IPipelineResponder
+public class PipeResponder : IPipelineResponder
 {
     public FSharpAsync<Unit> ResponseAsync(string res, StreamWriter writer)
     {
-        Helper.awaitTaskVoid(writer.WriteLineAsync("S " + res + " got it"));
-        Helper.awaitTaskVoid(writer.FlushAsync());
+        var t1 = writer.WriteLineAsync(res);
+        var t2 = writer.FlushAsync();
 
-        return null;
+        var voidTasks = Helper.combineVoidTasks(new List<System.Threading.Tasks.Task> { t1, t2 });
+
+        return voidTasks;
     }
 }
 ```
-
-Some interoperability code is planned so you don't have to add a reference to FSharp.Core to your C# project.
+Some interoperability code is planned so you don't have to add a reference to FSharp.Core to your C# project. Meanwhile you can use the Helper module.
 
 **IProtMessage**
 
@@ -266,11 +266,133 @@ let main argv =
 ```
 **C# Client-side**
 ``` csharp
-// will follow
+ // Pipeline member
+public class OutMember1 : IPipelineMember
+{
+    public string Proceed(string input) => input + "XX";
+}
+
+public class OutMember2 : IPipelineMember
+{
+    public string Proceed(string input) => "XX" + input;
+}
+
+public class OnServerResponse : IPipelineMember
+{
+    public string Proceed(string input)
+    {
+        Console.WriteLine("ServerResponse: " + input);
+        return input;
+    }
+}
+
+// Messags
+public class Msg1 : IProtMessage
+{
+    public bool Validate(string message) => message[0] == '1';
+}
+
+public class Msg2 : IProtMessage
+{
+    public bool Validate(string message) => message[0] == '2';
+}
+
+public class ServerResponse : IProtMessage
+{
+    public bool Validate(string message) => message[0] == 'S';
+}
+
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        var msg1OutPipe = Helper.castToFsharpList(new List<IPipelineMember> { new OutMember1(), new OutMember2() });
+        var serverResponsePipe = Helper.castToFsharpList(new List<IPipelineMember> { new OnServerResponse() });
+        var nonResponder = FSharpOption<IPipelineResponder>.None;
+
+        var rntMngr = new EasyProt.Runtime.RuntimeManager();
+        // Register a message with an OutGoing-Pipeline
+        rntMngr.RegisterMessageOut(msg1OutPipe, new Msg1(), nonResponder);
+        // Register a message with default-In- and default-Out-Pipeline
+        rntMngr.RegisterMessage(new Msg2(), nonResponder);
+        // Register a message with an Incoming-Pipeline
+        rntMngr.RegisterMessageInc(serverResponsePipe, new ServerResponse(), nonResponder);
+
+        var client = rntMngr.GetProtClient();
+        client.ConnectAsync("127.0.0.1", 8080).Wait();
+        client.ListenAsync();
+
+        while (true)
+        {
+            var msg = System.Console.ReadLine();
+            client.SendAsync(msg).Wait();
+        }
+    }
+}
 ```
 **C# Server-side**
 ``` csharp
-// will follow
+public class IncMsg1 : IProtMessage
+{
+    public bool Validate(string message) => message[0] == 'X';
+}
+
+public class IncMsg2 : IProtMessage
+{
+    public bool Validate(string message) => message[0] == '2';
+}
+
+public class Log : IPipelineMember
+{
+    public string Proceed(string input)
+    {
+        Console.WriteLine(input);
+        return input;
+    }
+}
+
+public class outMsgHandler : IPipelineMember
+{
+    public string Proceed(string input) => "S " + input + " got it";
+}
+
+public class PipeResponder : IPipelineResponder
+{
+    public FSharpAsync<Unit> ResponseAsync(string res, StreamWriter writer)
+    {
+        var t1 = writer.WriteLineAsync(res);
+        var t2 = writer.FlushAsync();
+
+        var voidTasks = Helper.combineVoidTasks(new List<System.Threading.Tasks.Task> { t1, t2 });
+
+        return voidTasks;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        var outPipe = Helper.castToFsharpList(new List<IPipelineMember> { new outMsgHandler(), new Log() });
+        var responder = new FSharpOption<IPipelineResponder>(new PipeResponder());
+
+        var mngr = new RuntimeManager();
+        mngr.RegisterMessageOut(outPipe, new IncMsg1(), responder);
+        mngr.RegisterMessageOut(outPipe, new IncMsg2(), responder);
+        var server = mngr.GetProtServer();
+
+        server.OnClientConnected += (s, a) =>
+        {
+            var networkStream = a.ClientStream as System.Net.Sockets.NetworkStream;
+            // do something with the networkstream
+            Console.WriteLine("inc con");
+        };
+
+        server.ListenForClientsAsync(8080);
+        Console.ReadLine();
+    }
+}
 ```
 **Sending messages:**
 ``` fsharp
@@ -284,7 +406,7 @@ client.SendAsync("Hey, dude!") |> ignore
 client.SendAsync("Hey, dude!")
 ```
 
-You can find this samples in EasyProt/tests/EasyProt.TestClient/Program.fs(Client) and  EasyProt/tests/EasyProt.TestServer/Program.fs (Server). Following you will see a screenshot of the including test client (left side) and test server (right side):
+You can find all these samples in [here](https://github.com/Jallah/EasyProt/tree/master/tests). Following you will see a screenshot of the including test client(s) (left side) and test server(s) (right side):
 
 ![alt tag](https://github.com/Jallah/EasyProt/blob/master/docs/files/img/ClientServer.jpg)
 

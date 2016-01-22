@@ -42,6 +42,7 @@ let main argv =
         let networkStream = a.ClientStream :?> System.Net.Sockets.NetworkStream
         // do something with the networkstream
         System.Console.WriteLine("inc con"))
+
     server.ListenForClientsAsync(8080)
     System.Console.ReadLine() |> ignore
     0

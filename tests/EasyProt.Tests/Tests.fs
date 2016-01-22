@@ -6,7 +6,7 @@ open EasyProt.Core
 
 
 [<Test>]
-let ``should return XXhalloXX`` () =
+let ``should return XXhelloXX`` () =
   let pipeline = new Pipeline()
   let member1 = {new IPipelineMember with
                     member this.Proceed input = input + "XX"}
@@ -16,7 +16,7 @@ let ``should return XXhalloXX`` () =
 
   let pipeMembers = [member1; member2]
 
-  let pipe = ((pipeline :> IPipeline).RunAsync pipeMembers) "hallo"
+  let pipe = ((pipeline :> IPipeline).RunAsync pipeMembers) "hello"
   let result = pipe |> Async.RunSynchronously
   printfn "%s" result
-  Assert.AreEqual(result , "XXhalloXX")
+  Assert.AreEqual(result , "XXhelloXX")
