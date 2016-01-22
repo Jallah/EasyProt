@@ -421,8 +421,7 @@ A NuGet-Package is planned.
 ## TODO
 - Make it possible to register a default handler for unknown messages
 - Make it possible to reRegister a message
-- Add some interOp code so you dont't have to add a ref to FSharp.Core to your C# project
-- Add C# examples to README
+- Shift the piplines and responder to the IPropMessage type
 - Add a flow chart image for the communication
 
 ## ISSUES
