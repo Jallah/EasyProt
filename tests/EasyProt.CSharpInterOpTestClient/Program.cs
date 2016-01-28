@@ -53,7 +53,7 @@ namespace EasyProt.CSharpInterOpTest
             var serverResponsePipe = Helper.castToFsharpList(new List<IPipelineMember> { new OnServerResponse() });
             var nonResponder = FSharpOption<IPipelineResponder>.None;
 
-            var rntMngr = new EasyProt.Runtime.RuntimeManager();
+            var rntMngr = new Runtime.RuntimeManager();
             // Register a message with an OutGoing-Pipeline
             rntMngr.RegisterMessageOut(msg1OutPipe, new Msg1(), nonResponder);
             // Register a message with default-In- and default-Out-Pipeline

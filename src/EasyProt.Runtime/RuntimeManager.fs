@@ -64,18 +64,20 @@ type Server(protServer : IProtServer,
     
     [<CLIEvent>]
     member __.OnClientConnected = protServer.OnClientConnected
-    member private __.RunInPipeAsync (stream: Stream) msg = match Helper.findMessage pipe msg with
-                                                          | Some(inPipeLine, outPipeline, _, responder) ->
-                                                            async { 
-                                                                //get the pipeline result --> feed the pipe
-                                                                let! inPipeResult = (new Pipeline() :> IPipeline).RunAsync inPipeLine msg
-                                                                match responder with
-                                                                | Some(resp) -> match outPipeline with
-                                                                                | [] -> do! resp.ResponseAsync inPipeResult (new StreamWriter(stream))
-                                                                                | pipe -> let! outPipeResult = (new Pipeline() :> IPipeline).RunAsync pipe inPipeResult // or msg ???
-                                                                                          do! resp.ResponseAsync outPipeResult (new StreamWriter(stream))
-                                                                | _ -> ()}
-                                                          | None -> failwith "No matching pipelinemember(s) or default pipelinemember found" //TODO: Resources
+    member private __.RunInPipeAsync (stream: Stream) msg =
+        match Helper.findMessage pipe msg with
+        | Some(inPipeLine, outPipeline, _, responder) ->
+          async { 
+              //get the pipeline result --> feed the pipe
+              let! inPipeResult = (new Pipeline() :> IPipeline).RunAsync inPipeLine msg
+              match responder with
+              | Some(resp) ->
+                match outPipeline with
+                | [] -> do! resp.ResponseAsync inPipeResult (new StreamWriter(stream))
+                | pipe -> let! outPipeResult = (new Pipeline() :> IPipeline).RunAsync pipe inPipeResult // or msg ???
+                          do! resp.ResponseAsync outPipeResult (new StreamWriter(stream))
+              | _ -> ()}
+        | None -> failwith "No matching pipelinemember(s) or default pipelinemember found" //TODO: Resources
 
     member private this.OnIncomingConnectionHanlder((_: obj), a: ClientConnectedEventArgs) =
 

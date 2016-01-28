@@ -32,6 +32,10 @@ let msg2 =
     { new IProtMessage with
           member this.Validate message = message.[0] = '2' }
 
+let msg3 = 
+    { new IProtMessage with
+          member this.Validate message = message.[0] = '3' }
+
 let serverResponse = 
     { new IProtMessage with
           member this.Validate message = message.[0] = 'S' }
@@ -40,11 +44,13 @@ let serverResponse =
 let main argv = 
     let rntMngr = new EasyProt.Runtime.RuntimeManager()
     // Register a message with an OutGoing-Pipeline
-    rntMngr.RegisterMessageOut [ outMember1; outMember2 ] msg1 None |> ignore
+    rntMngr.RegisterMessageOut [ outMember1; outMember2 ] msg1 None
     // Register a message with default-In- and default-Out-Pipeline
-    rntMngr.RegisterMessage msg2 None |> ignore
+    rntMngr.RegisterMessage msg2 None
     // Register a message with an Incoming-Pipeline
-    rntMngr.RegisterMessageInc [ onServerResponse ] serverResponse None |> ignore
+    rntMngr.RegisterMessageInc [ onServerResponse ] serverResponse None
+    rntMngr.RegisterMessageInc [ onServerResponse ] msg3 None
+
     let client = rntMngr.GetProtClient()
     client.ConnectAsync("127.0.0.1", 8080).Wait()
     client.ListenAsync() |> ignore
