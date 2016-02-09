@@ -2,15 +2,15 @@
 
 /// This interface ist just for convenience.
 /// Its a nice API for other .NET languages like C#.
-type IPipelineMember =
-    abstract member Proceed : string -> string
+type IPipelineMember<'a,'b> =
+    abstract member Proceed : input:'a -> 'b
 
-type IPipelineResponder =
-    abstract member ResponseAsync: string -> System.IO.StreamWriter -> Async<unit>
+type IPipelineResponder<'a> =
+    abstract member ResponseAsync: System.IO.StreamWriter -> 'a -> Async<unit>
 
 type IPipeline =
-   /// Runs the message Pipeline.
-   abstract member RunAsync : IPipelineMember list -> (string -> Async<string>)
+   // Runs the message Pipeline.
+   abstract member Run : input:string -> stream:System.IO.Stream -> unit
 
 type IncomingMessageEventArgs(message: string, stream: System.IO.Stream) =
     inherit System.EventArgs()
@@ -24,7 +24,7 @@ type IProtClient =
     [<CLIEvent>]
     abstract member OnIncomingMessage : IEvent<IngomingMessageDelegate, IncomingMessageEventArgs>
     abstract member ConnectAsync : ip:string * port:int -> Async<unit>
-    abstract member SendAsync : message:string -> Async<unit>
+    abstract member SendAsync : message:obj -> Async<unit>
     abstract member DisconnectAsync: Async<unit>
     abstract member ListenForMessageAsync: Async<unit>
 
@@ -40,12 +40,38 @@ type IProtServer =
     [<CLIEvent>]
     abstract member OnClientConnected : IEvent<ClientConnectedDelegate, ClientConnectedEventArgs>
 
-type IProtMessage =
-    /// This method is used to determine the message.
-    abstract member Validate : message:string -> bool
+type IProtMessage<'a> =
+//    let outpipe = defaultArg outpipe ({new IPipeline with member __.Run _ = ()})
+//    let inpipe = defaultArg inpipe ({new IPipeline with member __.Run _ = ()})
+//    new() = IProtMessage(?outpipe = None, ?inpipe = None)
+    abstract member Validate: message:'a -> bool
+//    member __.OutPipe with get() = outpipe
+//    member __.InPipe with get() = inpipe
+
+    
+
+//[<AbstractClass>]
+//type IProtMessage<'a> =
+//    abstract member Validate: message:'a -> bool
+//    default Validate message = 
+//
+//    inherit IProtMessage
+//    override this.InputTypeCheck message = message :? 'a
+    
+
+    
+    
+
+//type IProtMessage with
+//    member 
+
+type Message = 
+    {ProtMsgType:System.Type; Content:obj}
+
 //    // This methode will be called to handle incoming messages.
 //    // Outgoing messages will be handled by the defined Pipeline wich you can register with RuntimeManager.RegisterMessage()
 //    abstract member HandleMessageAsync : message:string -> Async<unit>
 
-    
+
+
 

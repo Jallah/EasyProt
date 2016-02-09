@@ -1,22 +1,21 @@
 module EasyProt.Tests
 
 open NUnit.Framework
-open EasyProt.Runtime
+open EasyProt.Runtime.Pipe
 open EasyProt.Core
 
 
 [<Test>]
 let ``should return XXhelloXX`` () =
-  let pipeline = new Pipeline()
-  let member1 = {new IPipelineMember with
+  let member1 = {new IPipelineMember<string, string> with
                     member this.Proceed input = input + "XX"}
 
-  let member2 = {new IPipelineMember with
+  let member2 = {new IPipelineMember<string, string> with
                     member this.Proceed input = "XX" + input}
 
-  let pipeMembers = [member1; member2]
+  let pipe = member1.Then(member2)
 
-  let pipe = ((pipeline :> IPipeline).RunAsync pipeMembers) "hello"
-  let result = pipe |> Async.RunSynchronously
+  let pipe = pipe.Proceed "hello"
+  let result = pipe 
   printfn "%s" result
   Assert.AreEqual(result , "XXhelloXX")

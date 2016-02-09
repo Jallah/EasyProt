@@ -2,14 +2,17 @@
 
 open EasyProt.Core
 
-type Pipeline() = 
-    interface IPipeline with
-        member __.RunAsync pipelineMember = 
-            let pipe = 
-                pipelineMember
-                |> List.map (fun m -> m.Proceed)
-                |> List.reduce (>>)
-            (fun input -> async { return pipe input })
+
+    
+
+//type Pipeline<'res>() = 
+//    interface IPipeline<'res> with
+//        member __.RunAsync pipelineMember = 
+//            let pipe = 
+//                pipelineMember
+//                //|> List.map (fun m -> m.Proceed)
+//                |> List.reduce (Helper.compose)
+//            (fun input -> async { return pipe input })
 
 open Helper
 open System.Net
@@ -79,3 +82,4 @@ type DefaultProtServer() =
                     let! client = listener.AcceptTcpClientAsync() |> Async.AwaitTask
                     clientConnectedEvent.Trigger(this, new ClientConnectedEventArgs(client.GetStream()))
             }
+

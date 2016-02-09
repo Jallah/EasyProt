@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using EasyProt.Core;
-using System.Threading.Tasks;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 using System.IO;
@@ -12,17 +9,17 @@ using EasyProt.Runtime;
 namespace EasyProt.CSharpInterOpTestServer
 {
 
-    public class IncMsg1 : IProtMessage
+    public class IncMsg1 : IProtMessage<string>
     {
         public bool Validate(string message) => message[0] == 'X';
     }
 
-    public class IncMsg2 : IProtMessage
+    public class IncMsg2 : IProtMessage<string>
     {
         public bool Validate(string message) => message[0] == '2';
     }
 
-    public class Log : IPipelineMember
+    public class Log : IPipelineMember<string, string>
     {
         public string Proceed(string input)
         {
@@ -31,20 +28,18 @@ namespace EasyProt.CSharpInterOpTestServer
         }
     }
 
-    public class outMsgHandler : IPipelineMember
+    public class outMsgHandler : IPipelineMember<string, string>
     {
         public string Proceed(string input) => "S " + input + " got it";
     }
 
-    public class PipeResponder : IPipelineResponder
+    public class PipeResponder : IPipelineResponder<string>
     {
-        public FSharpAsync<Unit> ResponseAsync(string res, StreamWriter writer)
+        public FSharpAsync<Unit> ResponseAsync( StreamWriter writer, string res)
         {
             var t1 = writer.WriteLineAsync(res);
             var t2 = writer.FlushAsync();
-
             var voidTasks = Helper.combineVoidTasks(new List<System.Threading.Tasks.Task> { t1, t2 });
-
             return voidTasks;
         }
     }
@@ -53,12 +48,15 @@ namespace EasyProt.CSharpInterOpTestServer
     {
         static void Main(string[] args)
         {
-            var outPipe = Helper.castToFsharpList(new List<IPipelineMember> { new outMsgHandler(), new Log() });
-            var responder = new FSharpOption<IPipelineResponder>(new PipeResponder());
+            var outPipe = (new outMsgHandler())
+                            .Then(new Log())
+                            .CreatePipe();
+
+            var responder = new PipeResponder().CreatePipeFromResponder();
 
             var mngr = new RuntimeManager();
-            mngr.RegisterMessageOut(outPipe, new IncMsg1(), responder);
-            mngr.RegisterMessageOut(outPipe, new IncMsg2(), responder);
+            mngr.RegisterMessageIncOut(outPipe, responder, new IncMsg1());
+            mngr.RegisterMessageIncOut(outPipe, responder, new IncMsg2());
             var server = mngr.GetProtServer();
 
             server.OnClientConnected += (s, a) =>
