@@ -1,5 +1,4 @@
-﻿
-namespace EasyProt.Runtime
+﻿namespace EasyProt.Runtime
 open Newtonsoft.Json
 
 module Helper =
