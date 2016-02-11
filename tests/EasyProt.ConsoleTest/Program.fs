@@ -45,6 +45,12 @@ let serverResponse =
 let main argv = 
 
         //let m = msg2.AddTypeCheck()
+
+        let m = msg2.AddTypeCheck();
+
+        let i = Newtonsoft.Json.JsonConvert.SerializeObject("2", EasyProt.Runtime.Helper.serializerSettings)
+
+        let res = m.Validate i
         let outPipeMsg1 = outMember1
                             .Then(outMember2)
                             .CreatePipe()

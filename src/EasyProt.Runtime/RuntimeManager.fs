@@ -1,4 +1,6 @@
 ﻿namespace EasyProt.Runtime
+open Newtonsoft.Json
+open EasyProt.Runtime.Helper
 
 open EasyProt.Core
 open EasyProt.Runtime.Pipe
@@ -14,12 +16,13 @@ type Client(protClient : IProtClient,
     do protClient.OnIncomingMessage.AddHandler(fun s a -> this.IncomingMessageEventHandler(s, a))
     member private __.GetMessage msg = Helper.findMessage pipe msg //pipe |> List.tryFind (fun (_, _, message,_) -> message.Validate(msg))
     
-    member this.SendAsync msg = 
-        match this.GetMessage msg with
+    member this.SendAsync msg =
+        let msgSerialized = JsonConvert.SerializeObject(msg, serializerSettings)
+        match this.GetMessage msgSerialized with
         | Some(_, outPipeline,_) ->
             async { 
                    //get the pipeline result --> feed the pipe
-                   let! pipelineResult =  async{ return outPipeline.Run(msg) }//(new Pipeline() :> IPipeline).RunAsync outPipeline msg
+                   let! pipelineResult =  async{ return outPipeline.Run msg null} //TODO: pipe muss res zurückgeben (vermutlich serialized oder deserialized)
                    do! protClient.SendAsync pipelineResult } |> Async.StartAsTask
         | None -> failwith "No matching pipelinemember(s) or default pipelinemember(s) found" //TODO: Resources
     
@@ -112,6 +115,6 @@ type RuntimeManager(?client, ?server) =
     member __.RegisterMessageInc incPipeline (message:IProtMessage<'a>) = messages <- (incPipeline, defaultPipeline, message.AddTypeCheck()) :: messages
     member __.RegisterMessageOut outPipeline (message:IProtMessage<'a>) = messages <- (defaultPipeline, outPipeline, message.AddTypeCheck()) :: messages
     member __.RegisterMessageIncOut incPipeline outPipeline (message:IProtMessage<'a>)  = messages <- (incPipeline, outPipeline, message.AddTypeCheck()) :: messages
-    member __.RegisterMessage message = messages <- (defaultPipeline, defaultPipeline, message) :: messages
+    member __.RegisterMessage (message:IProtMessage<'a>) = messages <- (defaultPipeline, defaultPipeline, message.AddTypeCheck()) :: messages
     member __.GetProtClient() = new Client(client, messages)
     member __.GetProtServer() = new Server(server, messages)

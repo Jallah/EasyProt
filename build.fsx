@@ -357,7 +357,7 @@ Target "All" DoNothing
 
 "CleanDocs"
   ==> "GenerateHelp"
-  ==> "GenerateReferenceDocs" //FAILS: https://github.com/fsprojects/ProjectScaffold/issues/170
+  ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
 
 "CleanDocs"

@@ -1,0 +1,6 @@
+Octokit.fsx(3,1): warning FS0211: The search directory 'C:\Users\Nicki\Desktop\Projects\EasyProt\paket-files\fsharp\FAKE\modules\Octokit\../../packages/Octokit/lib/net45' could not be found
+Octokit.fsx(4,1): warning FS0211: The search directory 'C:\Users\Nicki\Desktop\Projects\EasyProt\paket-files\fsharp\FAKE\modules\Octokit\../../../../../../packages/build/Octokit/lib/net45' could not be found
+build.fsx(168,9): warning FS0044: This construct is deprecated. use SourceLink.Index
+build.fsx(168,9): warning FS0044: This construct is deprecated. use SourceLink.Index
+build.fsx(169,9): warning FS0044: This construct is deprecated. use SourceLink.Index
+build.fsx(169,9): warning FS0044: This construct is deprecated. use SourceLink.Index

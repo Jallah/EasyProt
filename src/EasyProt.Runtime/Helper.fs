@@ -1,9 +1,16 @@
 ﻿
 namespace EasyProt.Runtime
+open Newtonsoft.Json
+
 module Helper =
     open System.Threading.Tasks
     open EasyProt.Core
     
+    let serializerSettings = 
+        let settings = JsonSerializerSettings()
+        settings.TypeNameHandling <- TypeNameHandling.All
+        settings
+
     let compose (pMember1:IPipelineMember<'a, 'b>) (pMember2:IPipelineMember<'b, 'c>) =
         { new IPipelineMember<'a, 'c> with
               member __.Proceed input = pMember1.Proceed input |> pMember2.Proceed }

@@ -1,13 +1,11 @@
 ﻿namespace EasyProt.Runtime
+open Newtonsoft.Json
+open EasyProt.Runtime.Helper
 
 [<System.Runtime.CompilerServices.Extension>]
 module Pipe = 
-    open Newtonsoft.Json
     
-    let serializerSettings = 
-        let settings = Newtonsoft.Json.JsonSerializerSettings()
-        settings.TypeNameHandling <- TypeNameHandling.All
-        settings
+    
 
     let deserialize<'a> msg = 
           Newtonsoft.Json.JsonConvert.DeserializeObject<'a>(msg, serializerSettings)
@@ -27,8 +25,9 @@ module Pipe =
     [<System.Runtime.CompilerServices.Extension>]
     let AddTypeCheck(m : IProtMessage<'a>) = 
         { new IProtMessage<string> with
-              member __.Validate msg = 
-                  let msgDeserialized = Newtonsoft.Json.JsonConvert.DeserializeObject(msg, serializerSettings)
+              member __.Validate msgSerialized =
+                  let test = msgSerialized;
+                  let msgDeserialized = JsonConvert.DeserializeObject(msgSerialized, serializerSettings)
                   match msgDeserialized.GetType() = typeof<'a> with
                   | true -> m.Validate <| (msgDeserialized :?> 'a)
                   | _ -> false }
@@ -41,8 +40,8 @@ module Pipe =
     let CreatePipe(m : IPipelineMember<'a,'b>) =
         { new IPipeline with
               member __.Run input _ = 
-                let msgDeserialized = Newtonsoft.Json.JsonConvert.DeserializeObject<'a>(input, serializerSettings)
-                m.Proceed msgDeserialized |> ignore }
+                let msgDeserialized = JsonConvert.DeserializeObject<'a>(input, serializerSettings)
+                m.Proceed msgDeserialized |> ignore}
 
     type IPipelineMember<'a,'b> with
         member this.CreatePipe() = CreatePipe(this)
@@ -73,13 +72,3 @@ module Pipe =
 
     type IPipelineResponder<'a> with
         member this.CreatePipeFromResponder() = CreatePipeFromResponder(this)
-    
-    
-    
-    
-
-    
-    
-   
-
-        //todo ---> aus responder pipe
